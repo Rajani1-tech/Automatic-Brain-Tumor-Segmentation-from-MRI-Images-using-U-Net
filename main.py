@@ -3,28 +3,25 @@ import os
 import sys
 sys.path.append(os.path.abspath("."))
 
-
+from configs.config import Config
 from src.models.unet import UNetModel
 from src.training.trainer import Trainer
 from src.inference.predict import Predictor
 from src.evaluation.metrics import Evaluator
 from src.visualization.visualize import Visualizer
 
-# Build and compile model
 unet = UNetModel()
 unet.compile()
 unet.summary()
 
-# Train
-trainer = Trainer(unet)
-trainer.train()
+trainer = Trainer(unet, augment=True)
+model_history = trainer.train()
 
-# Predict & Visualize
-predictor = Predictor()
+predictor = Predictor(Config.MODEL_SAVE_PATH)
 visualizer = Visualizer(predictor)
-visualizer.show_prediction("../data/test/images/test1.png")
+visualizer.plot_training_history(model_history, save_path="training_loss_accuracy.png")
+visualizer.show_prediction(os.path.join(Config.VAL_IMAGES_DIR, "image_001.png"))
 
-# Evaluate
 evaluator = Evaluator(predictor)
-metrics = evaluator.evaluate_dataset("../data/val/images", "../data/val/masks")
+metrics = evaluator.evaluate_dataset(Config.VAL_IMAGES_DIR, Config.VAL_MASKS_DIR)
 print(metrics)
