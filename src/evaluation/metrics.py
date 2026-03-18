@@ -1,7 +1,8 @@
 # src/evaluation/evaluator.py
 import os
 import cv2
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+import numpy as np
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from configs.config import Config
 from src.inference.predict import Predictor
 
@@ -9,26 +10,47 @@ class Evaluator:
     def __init__(self, predictor: Predictor):
         self.predictor = predictor
 
+    def _dice_coefficient(self, y_true, y_pred):
+        smooth = 1.
+        y_true_f = y_true.flatten()
+        y_pred_f = y_pred.flatten()
+        intersection = np.sum(y_true_f * y_pred_f)
+        return (2. * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
+
+    def _iou_score(self, y_true, y_pred):
+        smooth = 1.
+        y_true_f = y_true.flatten()
+        y_pred_f = y_pred.flatten()
+        intersection = np.sum(y_true_f * y_pred_f)
+        union = np.sum(y_true_f) + np.sum(y_pred_f) - intersection
+        return (intersection + smooth) / (union + smooth)
+
     def evaluate_dataset(self, images_dir, masks_dir):
         images_list = sorted(os.listdir(images_dir))
         masks_list = sorted(os.listdir(masks_dir))
 
-        y_true, y_pred = [], []
+        y_true_all, y_pred_all = [], []
+        dice_scores, iou_scores = [], []
 
         for img_name, mask_name in zip(images_list, masks_list):
             mask_gt = cv2.imread(os.path.join(masks_dir, mask_name), cv2.IMREAD_GRAYSCALE)
             mask_gt = cv2.resize(mask_gt, (Config.IMG_WIDTH, Config.IMG_HEIGHT))
-            mask_gt = (mask_gt > 127).astype(int)
+            mask_gt = (mask_gt > 127).astype(np.int32)
 
             mask_pred = self.predictor.predict(os.path.join(images_dir, img_name))
-            mask_pred = (mask_pred > 127).astype(int)
+            mask_pred = (mask_pred > 127).astype(np.int32)
 
-            y_true.extend(mask_gt.flatten())
-            y_pred.extend(mask_pred.flatten())
+            y_true_all.extend(mask_gt.flatten())
+            y_pred_all.extend(mask_pred.flatten())
+
+            dice_scores.append(self._dice_coefficient(mask_gt, mask_pred))
+            iou_scores.append(self._iou_score(mask_gt, mask_pred))
 
         return {
-            "accuracy": accuracy_score(y_true, y_pred),
-            "precision": precision_score(y_true, y_pred),
-            "recall": recall_score(y_true, y_pred),
-            "f1_score": f1_score(y_true, y_pred)
+            "accuracy": accuracy_score(y_true_all, y_pred_all),
+            "precision": precision_score(y_true_all, y_pred_all, zero_division=0),
+            "recall": recall_score(y_true_all, y_pred_all, zero_division=0),
+            "f1_score": f1_score(y_true_all, y_pred_all, zero_division=0),
+            "dice_coefficient": np.mean(dice_scores),
+            "iou": np.mean(iou_scores)
         }
