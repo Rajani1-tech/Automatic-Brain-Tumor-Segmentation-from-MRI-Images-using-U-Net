@@ -2,17 +2,18 @@
 import os
 import numpy as np
 import cv2
-from keras.utils import Sequence
+import torch
+from torch.utils.data import Dataset
 from configs.config import Config
 import albumentations as A
 
-class BrainTumorDataset(Sequence):
-    def __init__(self, images_dir, masks_dir, batch_size=Config.BATCH_SIZE,
-                 img_size=(Config.IMG_HEIGHT, Config.IMG_WIDTH), augment=False, **kwargs):
-        super().__init__(**kwargs)
+
+class BrainTumorDataset(Dataset):
+    def __init__(self, images_dir, masks_dir,
+                 img_size=(Config.IMG_HEIGHT, Config.IMG_WIDTH),
+                 augment=False):
         self.images_dir = images_dir
         self.masks_dir = masks_dir
-        self.batch_size = batch_size
         self.img_size = img_size
         self.augment = augment
         self.images_list = sorted(os.listdir(images_dir))
@@ -26,42 +27,26 @@ class BrainTumorDataset(Sequence):
             ])
 
     def __len__(self):
-        return len(self.images_list) // self.batch_size
+        return len(self.images_list)
 
     def __getitem__(self, idx):
-        batch_images = self.images_list[idx * self.batch_size:(idx + 1) * self.batch_size]
-        batch_masks = self.masks_list[idx * self.batch_size:(idx + 1) * self.batch_size]
+        img_path = os.path.join(self.images_dir, self.images_list[idx])
+        mask_path = os.path.join(self.masks_dir, self.masks_list[idx])
 
-        X = np.zeros((self.batch_size, self.img_size[0], self.img_size[1], 1), dtype=np.float32)
-        Y = np.zeros((self.batch_size, self.img_size[0], self.img_size[1], 1), dtype=np.float32)
+        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
 
-        for i, (img_name, mask_name) in enumerate(zip(batch_images, batch_masks)):
-            img_path = os.path.join(self.images_dir, img_name)
-            mask_path = os.path.join(self.masks_dir, mask_name)
+        img = cv2.resize(img, self.img_size).astype(np.float32) / 255.0
+        mask = cv2.resize(mask, self.img_size).astype(np.float32)
+        mask = (mask > 127).astype(np.float32)
 
-            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        if self.augment:
+            augmented = self.transform(image=img, mask=mask)
+            img = augmented["image"]
+            mask = augmented["mask"]
 
-            img = cv2.resize(img, self.img_size).astype(np.float32) / 255.0
-            mask = cv2.resize(mask, self.img_size).astype(np.float32)
-            mask = (mask > 127).astype(np.float32)
+        # PyTorch expects (C, H, W)
+        img = torch.from_numpy(img).unsqueeze(0)    # (1, H, W)
+        mask = torch.from_numpy(mask).unsqueeze(0)  # (1, H, W)
 
-            if self.augment:
-                augmented = self.transform(image=img, mask=mask)
-                img = augmented["image"]
-                mask = augmented["mask"]
-
-            # Ensure channel dimension for both image and mask
-            img = np.expand_dims(img, axis=-1) if img.ndim == 2 else img
-            mask = np.expand_dims(mask, axis=-1) if mask.ndim == 2 else mask
-
-            X[i] = img
-            Y[i] = mask
-
-        return X, Y
-
-    def on_epoch_end(self):
-        indices = np.arange(len(self.images_list))
-        np.random.shuffle(indices)
-        self.images_list = [self.images_list[i] for i in indices]
-        self.masks_list = [self.masks_list[i] for i in indices]
+        return img, mask
