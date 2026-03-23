@@ -1,27 +1,51 @@
 # main.py
 import os
 import sys
+import torch
 sys.path.append(os.path.abspath("."))
 
 from configs.config import Config
 from src.models.unet import UNetModel
+from src.models.attention_unet import AttentionUNetModel
 from src.training.trainer import Trainer
 from src.inference.predict import Predictor
 from src.evaluation.metrics import Evaluator
-from src.visualization.visualize import Visualizer
+
+os.makedirs("models", exist_ok=True)
+
+print(f"\nGPU available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"GPU: {torch.cuda.get_device_name(0)}\n")
+
+print("Training U-Net...\n")
 
 unet = UNetModel()
-unet.compile()
-unet.summary()
+trainer_unet = Trainer(unet, augment=True)
+history_unet = trainer_unet.train(save_path="models/unet.pth")
 
-trainer = Trainer(unet, augment=True)
-model_history = trainer.train()
+predictor_unet = Predictor("models/unet.pth", model=UNetModel())
+evaluator_unet = Evaluator(predictor_unet)
+metrics_unet = evaluator_unet.evaluate_dataset(Config.VAL_IMAGES_DIR, Config.VAL_MASKS_DIR)
 
-predictor = Predictor(Config.MODEL_SAVE_PATH)
-visualizer = Visualizer(predictor)
-visualizer.plot_training_history(model_history, save_path="training_loss_accuracy.png")
-visualizer.show_prediction(os.path.join(Config.VAL_IMAGES_DIR, "image_001.png"))
+print("\nU-Net Results:")
+for k, v in metrics_unet.items():
+    print(f"  {k}: {v:.4f}")
 
-evaluator = Evaluator(predictor)
-metrics = evaluator.evaluate_dataset(Config.VAL_IMAGES_DIR, Config.VAL_MASKS_DIR)
-print(metrics)
+print("\nTraining Attention U-Net...\n")
+
+att_unet = AttentionUNetModel()
+trainer_att = Trainer(att_unet, augment=True)
+history_att = trainer_att.train(save_path="models/attention_unet.pth")
+
+predictor_att = Predictor("models/attention_unet.pth", model=AttentionUNetModel())
+evaluator_att = Evaluator(predictor_att)
+metrics_att = evaluator_att.evaluate_dataset(Config.VAL_IMAGES_DIR, Config.VAL_MASKS_DIR)
+
+print("\nAttention U-Net Results:")
+for k, v in metrics_att.items():
+    print(f"  {k}: {v:.4f}")
+
+# ── Comparison ───────────────────────────────────────────────────────────────
+print("\nModel Comparison:")
+print(f"  U-Net          Dice: {metrics_unet['dice_coefficient']:.4f} | IoU: {metrics_unet['iou']:.4f}")
+print(f"  Attention U-Net Dice: {metrics_att['dice_coefficient']:.4f} | IoU: {metrics_att['iou']:.4f}")
