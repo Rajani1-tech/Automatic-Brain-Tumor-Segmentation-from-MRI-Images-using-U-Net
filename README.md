@@ -148,18 +148,62 @@ Measures the ability of the model to detect tumor regions.
 
 The model outputs include:
 
-* Original MRI image
-* Ground truth tumor segmentation mask
-* Predicted segmentation mask
-* Overlay visualization highlighting tumor regions
+- Original MRI image  
+- Ground truth tumor segmentation mask  
+- Predicted segmentation mask (U-Net)  
+- Predicted segmentation mask (Attention U-Net)  
+- Overlay visualization highlighting tumor regions  
 
 These visual outputs enable qualitative evaluation of model performance.
 
-Example output pipeline:
+---
 
-MRI Image → Segmentation Model → Predicted Tumor Mask → Visualization Overlay
+### Tumor Segmentation Comparison
+
+The figure below compares tumor segmentation results across models:
+
+- Original MRI image  
+- Ground truth mask  
+- Predicted mask by U-Net  
+- Predicted mask by Attention U-Net  
+
+<img width="100%" alt="sample_00" src="https://github.com/user-attachments/assets/3995f538-7060-4f83-b571-1f78ea22128b" />
 
 ---
+<details>
+<summary> View More Sample Outputs</summary>
+
+### Sample 1
+<img src="<img width="2921" height="754" alt="sample_04" src="https://github.com/user-attachments/assets/6262d655-13a2-4a01-a121-5881f61d8b95" />
+" width="100%" />
+
+### Sample 2
+<img src="<img width="2921" height="754" alt="sample_08" src="https://github.com/user-attachments/assets/dc5656fb-2e22-4106-9bb8-cc066860ba5b" />
+" width="100%" />
+
+### Sample 3
+<img src="<img width="2921" height="754" alt="sample_05" src="https://github.com/user-attachments/assets/c65b2b0a-9c03-4fe4-917c-28164176c87a" />
+" width="100%" />
+
+</details>
+
+### Overlay Visualization
+
+The following output shows tumor region overlays on the brain:
+
+- Original MRI image  
+- Overlay with U-Net prediction  
+- Overlay with Attention U-Net prediction  
+
+<img width="100%" alt="sample_03" src="https://github.com/user-attachments/assets/f474cd2f-38f7-4e22-b8c7-e6a73f1bf189" />
+
+---
+
+### 📊 Observation
+
+- Both models successfully capture tumor regions.  
+- Attention U-Net produces slightly more refined and focused segmentation.  
+- Overlay visualizations highlight how predictions align with actual tumor regions.
 
 ## 8. Applications
 
@@ -240,6 +284,22 @@ Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
 * segmentation-models-pytorch
 
 ---
+
+## 13. Results
+
+The models were evaluated using standard medical image segmentation metrics including Dice Coefficient and Intersection over Union (IoU). The comparison between U-Net and Attention U-Net is summarized below:
+
+### Model Performance Comparison
+
+| Model           | Accuracy | Precision | Recall | F1 Score | Dice Coefficient | IoU    |
+| --------------- | -------- | --------- | ------ | -------- | ---------------- | ------ |
+| U-Net           | 0.9965   | 0.9190    | 0.9500 | 0.9343   | 0.8283           | 0.7610 |
+| Attention U-Net | 0.9965   | 0.9159    | 0.9525 | 0.9338   | 0.8308           | 0.7631 |
+
+### Observation
+
+- Attention U-Net shows a slight improvement over the standard U-Net in Dice Coefficient and IoU.  
+- The attention mechanism helps the model focus better on relevant tumor regions, resulting in marginally improved segmentation performance.
 
 ## Author
 
