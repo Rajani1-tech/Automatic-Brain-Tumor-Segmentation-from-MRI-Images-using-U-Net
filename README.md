@@ -285,7 +285,34 @@ Automatic-Brain-Tumor-Segmentation/
 ├── README.md
 └── LICENSE
 
-```
+```Installation
+Clone the repository
+git clone git@github.com:Rajani1-tech/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
+cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
+Create a virtual environment
+python3 -m venv brain_seg_env
+
+Activate the environment:
+
+source brain_seg_env/bin/activate
+Install dependencies
+pip install -r requirements.txt
+Usage
+Training
+python main.py
+
+This will:
+
+Train the segmentation model
+Save model weights in the models/ directory
+Testing / Inference
+python test.py
+
+This will:
+
+Load the trained model
+Perform inference on test images
+Save results in the outputs/ directory
 
 ---
 
