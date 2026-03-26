@@ -1,5 +1,5 @@
 
-# Automatic Brain Tumor Segmentation from MRI Images
+# Automatic Brain Tumor Segmentation from MRI Images using U-Net
 
 ## Abstract
 
