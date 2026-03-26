@@ -143,27 +143,70 @@ Loss Functions:
 
 ## 7. Experimental Results
 
-The outputs include:
+### Quantitative Results
 
-* Original MRI image
-* Ground truth mask
-* Predicted mask (U-Net)
-* Predicted mask (Attention U-Net)
-* Overlay visualization
-
-### Model Performance
-
-| Model           | Accuracy | Precision | Recall | F1 Score | Dice   | IoU    |
-| --------------- | -------- | --------- | ------ | -------- | ------ | ------ |
-| U-Net           | 0.9965   | 0.9190    | 0.9500 | 0.9343   | 0.8283 | 0.7610 |
-| Attention U-Net | 0.9965   | 0.9159    | 0.9525 | 0.9338   | 0.8308 | 0.7631 |
+| Model           | Accuracy | Precision | Recall | F1 Score | Dice | IoU  |
+|----------------|----------|----------|--------|----------|------|------|
+| U-Net           | 0.9965   | 0.9190   | 0.9500 | 0.9343   | 0.8283 | 0.7610 |
+| Attention U-Net | 0.9965   | 0.9159   | 0.9525 | 0.9338   | 0.8308 | 0.7631 |
 
 ### Observation
 
-* Attention U-Net shows slight improvement in Dice and IoU
-* Provides more focused segmentation
+- Both models successfully capture tumor regions  
+- Attention U-Net produces slightly more refined segmentation  
+- Improvement is observed in Dice coefficient and IoU  
 
 ---
+
+### Qualitative Results
+
+The model outputs include:
+
+- Original MRI image  
+- Ground truth tumor mask  
+- Predicted mask (U-Net)  
+- Predicted mask (Attention U-Net)  
+- Overlay visualization  
+
+---
+
+#### Tumor Segmentation Comparison
+
+<img width="100%" src="https://github.com/user-attachments/assets/3995f538-7060-4f83-b571-1f78ea22128b" />
+
+<details>
+<summary>View More Segmentation Results</summary>
+
+##### Sample 1
+<img width="100%" src="https://github.com/user-attachments/assets/6262d655-13a2-4a01-a121-5881f61d8b95" />
+
+##### Sample 2
+<img width="100%" src="https://github.com/user-attachments/assets/dc5656fb-2e22-4106-9bb8-cc066860ba5b" />
+
+##### Sample 3
+<img width="100%" src="https://github.com/user-attachments/assets/c65b2b0a-9c03-4fe4-917c-28164176c87a" />
+
+</details>
+
+---
+
+#### Overlay Visualization
+
+<img width="100%" src="https://github.com/user-attachments/assets/f474cd2f-38f7-4e22-b8c7-e6a73f1bf189" />
+
+<details>
+<summary>View More Overlay Results</summary>
+
+##### Sample 1
+<img width="100%" src="https://github.com/user-attachments/assets/7c466084-687f-4178-8209-6226455f308a" />
+
+##### Sample 2
+<img width="100%" src="https://github.com/user-attachments/assets/c417b557-fb92-4554-b33b-559cbde52db4" />
+
+##### Sample 3
+<img width="100%" src="https://github.com/user-attachments/assets/e78904e3-9835-4c28-8268-0ea2a88bbc5b" />
+
+</details>
 
 ## 8. Applications
 
