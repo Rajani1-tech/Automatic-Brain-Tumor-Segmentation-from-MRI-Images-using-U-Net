@@ -26,9 +26,9 @@ class Trainer:
         val_dataset = BrainTumorDataset(val_dir, val_mask, augment=False)
 
         self.train_loader = DataLoader(train_dataset, batch_size=Config.BATCH_SIZE,
-                                       shuffle=True, num_workers=4, pin_memory=True)
+                                       shuffle=True, num_workers=2, pin_memory=True)
         self.val_loader = DataLoader(val_dataset, batch_size=Config.BATCH_SIZE,
-                                     shuffle=False, num_workers=4, pin_memory=True)
+                                     shuffle=False, num_workers=2, pin_memory=True)
 
     def train(self, epochs=Config.EPOCHS, save_path=Config.MODEL_SAVE_PATH):
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
