@@ -171,19 +171,12 @@ The figure below compares tumor segmentation results across models:
 <details>
    
 <summary> View More Sample Outputs</summary>
-
 ### Sample 1
-<img src="<img width="2921" height="754" alt="sample_04" src="https://github.com/user-attachments/assets/6262d655-13a2-4a01-a121-5881f61d8b95" />
-" width="100%" />
-
+<img width="2921" height="754" alt="sample_04" src="https://github.com/user-attachments/assets/6262d655-13a2-4a01-a121-5881f61d8b95" />
 ### Sample 2
 <img src="<img width="2921" height="754" alt="sample_08" src="https://github.com/user-attachments/assets/dc5656fb-2e22-4106-9bb8-cc066860ba5b" />
-" width="100%" />
-
 ### Sample 3
-<img src="<img width="2921" height="754" alt="sample_05" src="https://github.com/user-attachments/assets/c65b2b0a-9c03-4fe4-917c-28164176c87a" />
-" width="100%" />
-
+<img width="2921" height="754" alt="sample_05" src="https://github.com/user-attachments/assets/c65b2b0a-9c03-4fe4-917c-28164176c87a" />
 </details>
 ---
 
@@ -196,20 +189,14 @@ The following output shows tumor region overlays on the brain:
 - Overlay with Attention U-Net prediction  
 
 <img width="100%" alt="sample_03" src="https://github.com/user-attachments/assets/f474cd2f-38f7-4e22-b8c7-e6a73f1bf189" />
+<details>
 <summary> View More Sample Outputs</summary>
-
 ### Sample 1
-<img src="<img width="2218" height="765" alt="sample_07" src="https://github.com/user-attachments/assets/7c466084-687f-4178-8209-6226455f308a" />
-" width="100%" />
-
+<img width="2218" height="765" alt="sample_07" src="https://github.com/user-attachments/assets/7c466084-687f-4178-8209-6226455f308a" />
 ### Sample 2
-<img <img width="2218" height="765" alt="sample_01" src="https://github.com/user-attachments/assets/c417b557-fb92-4554-b33b-559cbde52db4" />
-" width="100%" />
-
+ <img width="2218" height="765" alt="sample_01" src="https://github.com/user-attachments/assets/c417b557-fb92-4554-b33b-559cbde52db4" />
 ### Sample 3
-<img <img width="2218" height="765" alt="sample_02" src="https://github.com/user-attachments/assets/e78904e3-9835-4c28-8268-0ea2a88bbc5b" />
-" width="100%" />
-
+ <img width="2218" height="765" alt="sample_02" src="https://github.com/user-attachments/assets/e78904e3-9835-4c28-8268-0ea2a88bbc5b" />
 </details>
 
 ---
