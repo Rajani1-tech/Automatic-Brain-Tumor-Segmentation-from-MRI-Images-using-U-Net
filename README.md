@@ -36,7 +36,7 @@ This project uses the BraTS 2020 (Brain Tumor Segmentation) dataset obtained fro
 
 ### Dataset Description
 
-The BraTS 2020 dataset consists of multi-modal MRI scans collected from multiple institutions and annotated by expert radiologists. It includes different MRI modalities such as T1, T1ce, T2, and FLAIR, along with ground truth segmentation masks for tumor regions. ([遇见数据集][1])
+The BraTS 2020 dataset consists of multi-modal MRI scans collected from multiple institutions and annotated by expert radiologists. It includes different MRI modalities such as T1, T1ce, T2, and FLAIR, along with ground truth segmentation masks for tumor regions.
 
 Each MRI volume typically has a resolution of **240 × 240 × 155**, which is commonly resized for 2D model training. 
 
