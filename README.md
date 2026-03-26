@@ -248,32 +248,42 @@ Potential improvements include:
 ## 11. Project Structure
 
 ```id="kjf94a"
-Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
-.
-├── brain_seg_env
-├── configs
-│   ├── config.py
-│   └── __pycache__
-├── data
-│   ├── test
-│   ├── train
-│   └── val
-├── LICENSE
-├── main.py
-├── notebook
+Automatic-Brain-Tumor-Segmentation/
+├── configs/
+│   └── config.py
+├── data/
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── models/
+│   ├── attention_unet.pth
+│   └── unet.pth
+├── notebook/
 │   └── data_processing.ipynb
-├
-├── README.md
+├── outputs/
+│   ├── comparisons/
+│   ├── full_figures/
+│   └── overlays/
+├── src/
+│   ├── datasets/
+│   │   └── dataset.py
+│   ├── models/
+│   │   ├── unet.py
+│   │   └── attention_unet.py
+│   ├── training/
+│   │   ├── trainer.py
+│   │   └── losses.py
+│   ├── evaluation/
+│   │   └── metrics.py
+│   ├── inference/
+│   │   └── predict.py
+│   └── visualization/
+│       └── visualize.py
+├── main.py
+├── test.py
 ├── requirements.txt
-└── src
-    ├── datasets
-    ├── evaluation
-    ├── inference
-    ├── models
-    ├── __pycache__
-    ├── training
-    └── visualization
-
+├── README.md
+└── LICENSE
 
 ```
 
