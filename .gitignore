@@ -1,0 +1,28 @@
+# Virtual environment
+brain_seg_env/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Models
+*.pth
+*.pt
+*.h5
+
+# Data (optional, if large)
+data/
+datasets/
+
+# OS files
+.DS_Store
+# Dataset
+BraTS2020_training_data/
+brain_seg_env/
+BraTS2020_training_data/
+*.h5
+*.pth
+__pycache__/
+*.pyc

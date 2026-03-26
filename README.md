@@ -1,9 +1,9 @@
-
 # Automatic Brain Tumor Segmentation from MRI Images using U-Net
+
 
 ## Abstract
 
-Brain tumor detection and localization from magnetic resonance imaging (MRI) scans is a critical task in clinical diagnosis and treatment planning. Manual segmentation by radiologists is time-consuming and prone to inter-observer variability. This project proposes an automated deep learning-based framework for brain tumor segmentation using convolutional neural networks. A U-Net architecture, along with an enhanced Attention U-Net variant, is implemented to perform pixel-level segmentation of tumor regions in MRI scans. The model is trained and evaluated using annotated medical imaging datasets, and performance is assessed using standard metrics such as Dice coefficient and Intersection over Union (IoU).
+Brain tumor detection and localization from magnetic resonance imaging (MRI) scans is a critical task in clinical diagnosis and treatment planning. Manual segmentation by radiologists is time-consuming and prone to inter-observer variability. This project proposes an automated deep learning-based framework for **brain tumor segmentation using convolutional neural networks**. A U-Net architecture is implemented to perform pixel-level segmentation of tumor regions in MRI scans. The model is trained and evaluated using annotated medical imaging datasets, and performance is assessed using standard medical segmentation metrics such as Dice coefficient and Intersection over Union (IoU).
 
 ---
 
@@ -11,59 +11,47 @@ Brain tumor detection and localization from magnetic resonance imaging (MRI) sca
 
 Brain tumors are abnormal growths of cells in the brain that can significantly impact neurological function and patient survival. Early detection and accurate localization of tumor regions are essential for effective treatment planning.
 
-Magnetic Resonance Imaging (MRI) provides high-resolution anatomical information and is widely used for diagnosis. However, manual segmentation is labor-intensive and requires expert knowledge.
+Magnetic Resonance Imaging (MRI) is widely used for diagnosing brain tumors because it provides high-resolution anatomical information. However, manual interpretation and segmentation of tumor regions from MRI scans require significant expertise and time.
 
-Deep learning-based approaches, particularly encoder–decoder architectures such as U-Net, have shown strong performance in medical image segmentation tasks.
+Recent advances in deep learning have enabled automated medical image analysis systems capable of assisting radiologists in clinical workflows. Convolutional neural networks, particularly encoder–decoder architectures such as U-Net, have demonstrated strong performance in medical image segmentation tasks.
+
+This project explores the application of deep learning techniques for **automated segmentation of brain tumors from MRI images**.
 
 ---
 
 ## 2. Problem Statement
 
-The objective of this project is to develop a deep learning model that can:
+The goal of this project is to develop a deep learning model that can:
 
 * Accurately identify tumor regions in MRI scans
-* Perform pixel-level segmentation
-* Generate visual outputs highlighting tumor boundaries
-* Assist clinical workflows through automation
+* Perform **pixel-level segmentation** of brain tumors
+* Provide visual outputs that highlight tumor boundaries
+* Assist in improving efficiency in medical imaging workflows
 
 ---
 
 ## 3. Dataset
 
-This project uses the BraTS 2020 (Brain Tumor Segmentation) dataset obtained from Kaggle:
+This study utilizes the **LGG MRI Segmentation Dataset**, which contains annotated MRI images with tumor masks.
 
-🔗 [BraTS2020 Kaggle Dataset](https://www.kaggle.com/datasets/awsaf49/brats2020-training-data/code?utm_source=chatgpt.com)
+Dataset characteristics:
 
-### Dataset Description
+* MRI brain scans
+* Pixel-level segmentation masks
+* Image format: PNG
+* Corresponding mask images for each MRI scan
 
-The BraTS 2020 dataset consists of multi-modal MRI scans collected from multiple institutions and annotated by expert radiologists. It includes different MRI modalities such as T1, T1ce, T2, and FLAIR, along with ground truth segmentation masks for tumor regions.
+Dataset format:
 
-Each MRI volume typically has a resolution of **240 × 240 × 155**, which is commonly resized for 2D model training. 
-
-### Dataset Split (Used in this Project)
-
-| Split      | Number of Images |
-| ---------- | ---------------- |
-| Train      | 17,026           |
-| Validation | 3,666            |
-| Test       | 3,730            |
-
-### Image Configuration
-
-* Input image size: **240 × 240**
-* Converted to 2D slices for training
-* Binary segmentation masks used
-
-### Dataset Structure
-
-```bash
+```id="kk2ykr"
 dataset/
-├── images/
-│   ├── image_001.png
-│   ├── image_002.png
-├── masks/
-│   ├── image_001_mask.png
-│   ├── image_002_mask.png
+   images/
+      image_001.png
+      image_002.png
+
+   masks/
+      image_001_mask.png
+      image_002_mask.png
 ```
 
 Mask labels:
@@ -79,223 +67,169 @@ Mask labels:
 
 ### 4.1 Data Preprocessing
 
-* Resizing images to 240 × 240
-* Normalization of pixel values
-* Binary mask conversion
-* Dataset splitting into train, validation, and test sets
+The following preprocessing steps are applied:
+
+* Image resizing to **256 × 256 resolution**
+* Pixel intensity normalization
+* Binary conversion of segmentation masks
+* Dataset splitting into training, validation, and test sets
 
 ### 4.2 Data Augmentation
 
+To improve model robustness and reduce overfitting, several augmentation techniques are applied:
+
 * Horizontal flipping
 * Random rotation
-* Brightness and contrast adjustments
+* Contrast adjustments
+* Random brightness transformations
 
-### 4.3 Model Architectures
+### 4.3 Model Architecture
 
-#### U-Net
+The segmentation model is based on the **U-Net architecture**, a widely used convolutional neural network designed for biomedical image segmentation.
 
-U-Net is an encoder–decoder architecture designed for biomedical segmentation.
+The architecture consists of:
 
-* Encoder extracts spatial features
-* Bottleneck captures context
-* Decoder reconstructs segmentation mask
-* Skip connections preserve spatial information
+**Encoder (Contracting Path)**
+Extracts hierarchical spatial features using convolution and pooling layers.
 
-#### Attention U-Net
+**Bottleneck Layer**
+Captures deep contextual representations of the input image.
 
-Attention U-Net extends U-Net by incorporating attention gates.
+**Decoder (Expanding Path)**
+Upsamples feature maps to reconstruct the segmentation mask.
 
-* Filters irrelevant regions in the image
-* Focuses on tumor-specific regions
-* Improves localization accuracy
-* Reduces false positives
-
-This makes Attention U-Net particularly effective in complex medical segmentation tasks.
+Skip connections between encoder and decoder layers help preserve spatial information and improve segmentation accuracy.
 
 ---
 
 ## 5. Training Configuration
 
-| Parameter     | Value                   |
-| ------------- | ----------------------- |
-| Model         | U-Net / Attention U-Net |
-| Input Size    | 240 × 240               |
-| Optimizer     | Adam                    |
-| Learning Rate | 0.0001                  |
-| Batch Size    | 8                       |
-| Epochs        | 40                      |
+| Parameter        | Value     |
+| ---------------- | --------- |
+| Model            | U-Net     |
+| Input Resolution | 256 × 256 |
+| Optimizer        | Adam      |
+| Learning Rate    | 0.0001    |
+| Batch Size       | 8         |
+| Epochs           | 40        |
 
 Loss Functions:
 
 * Dice Loss
 * Binary Cross Entropy Loss
 
+These losses are commonly used in medical image segmentation to handle class imbalance and improve overlap accuracy.
+
 ---
 
 ## 6. Evaluation Metrics
 
-* Dice Coefficient
-* Intersection over Union (IoU)
-* Precision
-* Recall
+The segmentation model is evaluated using the following metrics:
+
+**Dice Coefficient**
+
+Measures the overlap between predicted segmentation and ground truth.
+
+**Intersection over Union (IoU)**
+
+Evaluates the intersection area between prediction and ground truth masks.
+
+**Precision**
+
+Measures the proportion of correctly predicted tumor pixels.
+
+**Recall**
+
+Measures the ability of the model to detect tumor regions.
 
 ---
 
 ## 7. Experimental Results
 
-### Quantitative Results
-
-| Model           | Accuracy | Precision | Recall | F1 Score | Dice | IoU  |
-|----------------|----------|----------|--------|----------|------|------|
-| U-Net           | 0.9965   | 0.9190   | 0.9500 | 0.9343   | 0.8283 | 0.7610 |
-| Attention U-Net | 0.9965   | 0.9159   | 0.9525 | 0.9338   | 0.8308 | 0.7631 |
-
-### Observation
-
-- Both models successfully capture tumor regions  
-- Attention U-Net produces slightly more refined segmentation  
-- Improvement is observed in Dice coefficient and IoU  
-
----
-
-### Qualitative Results
-
 The model outputs include:
 
-- Original MRI image  
-- Ground truth tumor mask  
-- Predicted mask (U-Net)  
-- Predicted mask (Attention U-Net)  
-- Overlay visualization  
+* Original MRI image
+* Ground truth tumor segmentation mask
+* Predicted segmentation mask
+* Overlay visualization highlighting tumor regions
+
+These visual outputs enable qualitative evaluation of model performance.
+
+Example output pipeline:
+
+MRI Image → Segmentation Model → Predicted Tumor Mask → Visualization Overlay
 
 ---
-
-#### Tumor Segmentation Comparison
-
-<img width="100%" src="https://github.com/user-attachments/assets/3995f538-7060-4f83-b571-1f78ea22128b" />
-
-<details>
-<summary>View More Segmentation Results</summary>
-
-##### Sample 1
-<img width="100%" src="https://github.com/user-attachments/assets/6262d655-13a2-4a01-a121-5881f61d8b95" />
-
-##### Sample 2
-<img width="100%" src="https://github.com/user-attachments/assets/dc5656fb-2e22-4106-9bb8-cc066860ba5b" />
-
-##### Sample 3
-<img width="100%" src="https://github.com/user-attachments/assets/c65b2b0a-9c03-4fe4-917c-28164176c87a" />
-
-</details>
-
----
-
-#### Overlay Visualization
-
-<img width="100%" src="https://github.com/user-attachments/assets/f474cd2f-38f7-4e22-b8c7-e6a73f1bf189" />
-
-<details>
-<summary>View More Overlay Results</summary>
-
-##### Sample 1
-<img width="100%" src="https://github.com/user-attachments/assets/7c466084-687f-4178-8209-6226455f308a" />
-
-##### Sample 2
-<img width="100%" src="https://github.com/user-attachments/assets/c417b557-fb92-4554-b33b-559cbde52db4" />
-
-##### Sample 3
-<img width="100%" src="https://github.com/user-attachments/assets/e78904e3-9835-4c28-8268-0ea2a88bbc5b" />
-
-</details>
 
 ## 8. Applications
 
+The proposed system can assist in:
+
 * Computer-aided diagnosis
 * Radiology workflow automation
-* Medical image analysis
-* Clinical decision support
+* Medical image analysis research
+* Clinical decision support systems
 
 ---
 
 ## 9. Limitations
 
-* Dependency on dataset size
-* MRI variability across scanners
-* Limited generalization
+Some limitations of the current approach include:
+
+* Dependence on dataset size
+* Variability in MRI acquisition parameters
+* Limited generalization across different hospitals or scanners
+
+Future work can address these limitations through larger datasets and advanced architectures.
 
 ---
 
 ## 10. Future Work
 
-* Streamlit-based web application for tumor segmentation
-* Real-time MRI upload and prediction
-* Exploration of UNet++, DeepLabV3+, and 3D CNNs
-* Integration of explainable AI
+Potential improvements include:
+
+* Implementing **Attention U-Net**
+* Exploring **3D CNN-based segmentation models**
+* Multi-class segmentation of tumor subregions
+* Integration of **Explainable AI techniques** for interpretability
 
 ---
 
 ## 11. Project Structure
 
-```bash
-Automatic-Brain-Tumor-Segmentation/
-├── configs/
-├── data/
-├── models/
-├── notebook/
-├── outputs/
-├── src/
+```id="kjf94a"
+Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
+.
+├── brain_seg_env
+├── configs
+│   ├── config.py
+│   └── __pycache__
+├── data
+│   ├── test
+│   ├── train
+│   └── val
+├── LICENSE
 ├── main.py
-├── test.py
-├── requirements.txt
+├── notebook
+│   └── data_processing.ipynb
+├
 ├── README.md
-└── LICENSE
+├── requirements.txt
+└── src
+    ├── datasets
+    ├── evaluation
+    ├── inference
+    ├── models
+    ├── __pycache__
+    ├── training
+    └── visualization
+
+
 ```
 
 ---
 
-## 12. Installation and Setup
-
-### Clone the repository
-
-```bash
-git clone git@github.com:Rajani1-tech/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
-cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
-```
-
-### Create virtual environment
-
-```bash
-python3 -m venv brain_seg_env
-source brain_seg_env/bin/activate
-```
-
-### Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 13. Usage
-
-### Training
-
-```bash
-python main.py
-```
-
-### Testing / Inference
-
-```bash
-python test.py
-```
-
-Outputs are saved in the `outputs/` directory.
-
----
-
-## 14. Technologies Used
+## 12. Technologies Used
 
 * Python
 * PyTorch
@@ -312,4 +246,3 @@ Outputs are saved in the `outputs/` directory.
 Rajani Lamichhane
 Machine Learning Engineer | Computer Vision | Biomedical AI
 
----

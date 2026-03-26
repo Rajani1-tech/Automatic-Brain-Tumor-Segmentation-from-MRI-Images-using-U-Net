@@ -11,6 +11,8 @@ class Config:
 
     TRAIN_IMAGES_DIR = "data/train/images/"
     TRAIN_MASKS_DIR = "data/train/masks/"
+    TEST_IMAGES_DIR = "data/test/images/"
+    TEST_MASKS_DIR = "data/test/masks/"
     VAL_IMAGES_DIR = "data/val/images/"
     VAL_MASKS_DIR = "data/val/masks/"
     MODEL_SAVE_PATH = "models_saved/unet_brain_tumor.pth"

@@ -44,8 +44,6 @@ metrics_att = evaluator_att.evaluate_dataset(Config.VAL_IMAGES_DIR, Config.VAL_M
 print("\nAttention U-Net Results:")
 for k, v in metrics_att.items():
     print(f"  {k}: {v:.4f}")
-
-# ── Comparison ───────────────────────────────────────────────────────────────
 print("\nModel Comparison:")
 print(f"  U-Net          Dice: {metrics_unet['dice_coefficient']:.4f} | IoU: {metrics_unet['iou']:.4f}")
 print(f"  Attention U-Net Dice: {metrics_att['dice_coefficient']:.4f} | IoU: {metrics_att['iou']:.4f}")

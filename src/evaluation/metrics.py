@@ -1,4 +1,4 @@
-# src/evaluation/evaluator.py
+# src/evaluation/metrics.py
 import os
 import cv2
 import numpy as np
