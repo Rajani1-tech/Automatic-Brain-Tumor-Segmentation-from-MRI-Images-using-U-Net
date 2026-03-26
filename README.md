@@ -168,9 +168,8 @@ The figure below compares tumor segmentation results across models:
 - Predicted mask by Attention U-Net  
 
 <img width="100%" alt="sample_00" src="https://github.com/user-attachments/assets/3995f538-7060-4f83-b571-1f78ea22128b" />
-
----
 <details>
+   
 <summary> View More Sample Outputs</summary>
 
 ### Sample 1
@@ -186,6 +185,7 @@ The figure below compares tumor segmentation results across models:
 " width="100%" />
 
 </details>
+---
 
 ### Overlay Visualization
 
@@ -196,6 +196,21 @@ The following output shows tumor region overlays on the brain:
 - Overlay with Attention U-Net prediction  
 
 <img width="100%" alt="sample_03" src="https://github.com/user-attachments/assets/f474cd2f-38f7-4e22-b8c7-e6a73f1bf189" />
+<summary> View More Sample Outputs</summary>
+
+### Sample 1
+<img src="<img width="2218" height="765" alt="sample_07" src="https://github.com/user-attachments/assets/7c466084-687f-4178-8209-6226455f308a" />
+" width="100%" />
+
+### Sample 2
+<img <img width="2218" height="765" alt="sample_01" src="https://github.com/user-attachments/assets/c417b557-fb92-4554-b33b-559cbde52db4" />
+" width="100%" />
+
+### Sample 3
+<img <img width="2218" height="765" alt="sample_02" src="https://github.com/user-attachments/assets/e78904e3-9835-4c28-8268-0ea2a88bbc5b" />
+" width="100%" />
+
+</details>
 
 ---
 
