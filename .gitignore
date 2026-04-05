@@ -20,3 +20,9 @@ datasets/
 .DS_Store
 # Dataset
 BraTS2020_training_data/
+brain_seg_env/
+BraTS2020_training_data/
+*.h5
+*.pth
+__pycache__/
+*.pyc
