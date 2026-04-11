@@ -20,7 +20,7 @@
 
 <br>
 
-📄 **[Read the full technical report (PDF)](https://YOUR_OVERLEAF_OR_PDF_LINK_HERE)** — architecture details, bug analysis, training curves, and extended results.
+📄 **[Read the full technical report (PDF)](docs/brain_tumour_seg_documents.pdf)** — architecture details, bug analysis, training curves, and extended results.
 
 </div>
 
@@ -36,7 +36,7 @@ A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET
 
 ## Pipeline
 
-![Pipeline diagram](docs/pipeline.png)
+![Pipeline diagram](docs/attention_unet_architecture.svg)
 
 ```
 Multi-modal MRI (T1, T1CE, T2, FLAIR)
@@ -52,7 +52,7 @@ Multi-modal MRI (T1, T1CE, T2, FLAIR)
 
 ## Architecture — Attention U-Net
 
-![Attention U-Net architecture](docs/unet_architecture.png)
+![Attention U-Net architecture](docs/attention_unet_architecture.svg)
 
 | Stage | Detail |
 |-------|--------|
