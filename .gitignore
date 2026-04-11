@@ -26,3 +26,5 @@ BraTS2020_training_data/
 *.pth
 __pycache__/
 *.pyc
+dataset/
+*.zip
