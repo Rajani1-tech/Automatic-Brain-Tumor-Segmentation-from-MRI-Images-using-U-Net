@@ -1,248 +1,232 @@
-# Automatic Brain Tumor Segmentation from MRI Images using U-Net
+# 🧠 Automatic Brain Tumor Segmentation from MRI Images
 
+<div align="center">
 
-## Abstract
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![BraTS2021](https://img.shields.io/badge/Dataset-BraTS%202021-blue)](https://www.synapse.org/brats2021)
+[![Mean Dice](https://img.shields.io/badge/Mean%20Dice-0.828-brightgreen)]()
+[![ET Dice](https://img.shields.io/badge/ET%20Dice-0.860-brightgreen)]()
+[![Streamlit](https://img.shields.io/badge/App-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Brain tumor detection and localization from magnetic resonance imaging (MRI) scans is a critical task in clinical diagnosis and treatment planning. Manual segmentation by radiologists is time-consuming and prone to inter-observer variability. This project proposes an automated deep learning-based framework for **brain tumor segmentation using convolutional neural networks**. A U-Net architecture is implemented to perform pixel-level segmentation of tumor regions in MRI scans. The model is trained and evaluated using annotated medical imaging datasets, and performance is assessed using standard medical segmentation metrics such as Dice coefficient and Intersection over Union (IoU).
+**An End-to-End Deep Learning Pipeline for Multiclass Brain Tumor Segmentation and Grade Classification from Multi-Modal MRI**
 
----
+*Rajani Lamichhane · Machine Learning Engineer · Computer Vision · Biomedical AI*
 
-## 1. Introduction
-
-Brain tumors are abnormal growths of cells in the brain that can significantly impact neurological function and patient survival. Early detection and accurate localization of tumor regions are essential for effective treatment planning.
-
-Magnetic Resonance Imaging (MRI) is widely used for diagnosing brain tumors because it provides high-resolution anatomical information. However, manual interpretation and segmentation of tumor regions from MRI scans require significant expertise and time.
-
-Recent advances in deep learning have enabled automated medical image analysis systems capable of assisting radiologists in clinical workflows. Convolutional neural networks, particularly encoder–decoder architectures such as U-Net, have demonstrated strong performance in medical image segmentation tasks.
-
-This project explores the application of deep learning techniques for **automated segmentation of brain tumors from MRI images**.
+</div>
 
 ---
 
-## 2. Problem Statement
+## 📋 Overview
 
-The goal of this project is to develop a deep learning model that can:
+This project presents a fully automated framework for **multiclass brain tumor segmentation** and **LGG/HGG grade prediction** from multi-modal MRI scans using the BraTS 2021 dataset.
 
-* Accurately identify tumor regions in MRI scans
-* Perform **pixel-level segmentation** of brain tumors
-* Provide visual outputs that highlight tumor boundaries
-* Assist in improving efficiency in medical imaging workflows
-
----
-
-## 3. Dataset
-
-This study utilizes the **LGG MRI Segmentation Dataset**, which contains annotated MRI images with tumor masks.
-
-Dataset characteristics:
-
-* MRI brain scans
-* Pixel-level segmentation masks
-* Image format: PNG
-* Corresponding mask images for each MRI scan
-
-Dataset format:
-
-```id="kk2ykr"
-dataset/
-   images/
-      image_001.png
-      image_002.png
-
-   masks/
-      image_001_mask.png
-      image_002_mask.png
+```
+4-Modality MRI Input (T1, T1CE, T2, FLAIR)
+            ↓
+  Attention U-Net Multiclass Segmentation
+            ↓
+ Region Analysis (NCR/NET · Edema · Enhancing Tumor)
+            ↓
+     Tumor Profile Classification + LGG/HGG Grade Prediction
+            ↓
+       Streamlit Clinical Web Interface
 ```
 
-Mask labels:
+| Metric | Value |
+|--------|-------|
+| Mean Dice | **0.828** |
+| Enhancing Tumor Dice | **0.860** |
+| NCR/NET Dice | **0.827** |
+| Edema Dice | **0.798** |
 
-| Pixel Value | Meaning      |
-| ----------- | ------------ |
-| 0           | Background   |
-| 255         | Tumor Region |
-
----
-
-## 4. Methodology
-
-### 4.1 Data Preprocessing
-
-The following preprocessing steps are applied:
-
-* Image resizing to **256 × 256 resolution**
-* Pixel intensity normalization
-* Binary conversion of segmentation masks
-* Dataset splitting into training, validation, and test sets
-
-### 4.2 Data Augmentation
-
-To improve model robustness and reduce overfitting, several augmentation techniques are applied:
-
-* Horizontal flipping
-* Random rotation
-* Contrast adjustments
-* Random brightness transformations
-
-### 4.3 Model Architecture
-
-The segmentation model is based on the **U-Net architecture**, a widely used convolutional neural network designed for biomedical image segmentation.
-
-The architecture consists of:
-
-**Encoder (Contracting Path)**
-Extracts hierarchical spatial features using convolution and pooling layers.
-
-**Bottleneck Layer**
-Captures deep contextual representations of the input image.
-
-**Decoder (Expanding Path)**
-Upsamples feature maps to reconstruct the segmentation mask.
-
-Skip connections between encoder and decoder layers help preserve spatial information and improve segmentation accuracy.
+> 🏆 ET Dice **0.860** surpasses 3D ResU-Net (0.800) — at significantly lower computational cost.
 
 ---
 
-## 5. Training Configuration
+## 🔬 Research Highlights
 
-| Parameter        | Value     |
-| ---------------- | --------- |
-| Model            | U-Net     |
-| Input Resolution | 256 × 256 |
-| Optimizer        | Adam      |
-| Learning Rate    | 0.0001    |
-| Batch Size       | 8         |
-| Epochs           | 40        |
+**1. Critical Data Pipeline Bug → +0.654 Mean Dice with zero architectural changes** (see [§ Bug Discovery](#-critical-bug-discovery))
 
-Loss Functions:
+**2. Attention gates provide no measurable benefit** (Δ Mean Dice: 0.001) when multi-modal input already provides strong spatial discriminative signal via T1CE.
 
-* Dice Loss
-* Binary Cross Entropy Loss
-
-These losses are commonly used in medical image segmentation to handle class imbalance and improve overlap accuracy.
+**3. Correct 2D multi-modal assembly matches 3D architecture performance** — data quality matters more than model complexity.
 
 ---
 
-## 6. Evaluation Metrics
+## 📊 Results
 
-The segmentation model is evaluated using the following metrics:
+### Model Comparison
 
-**Dice Coefficient**
+| Model | Mean Dice | Mean IoU | Accuracy |
+|-------|-----------|----------|----------|
+| U-Net Binary | 0.146 | 0.096 | 0.941 |
+| Attn U-Net Binary | 0.141 | 0.092 | 0.944 |
+| U-Net Multiclass | **0.828** | **0.763** | 0.993 |
+| Attn U-Net Multiclass | **0.828** | **0.763** | **0.993** |
 
-Measures the overlap between predicted segmentation and ground truth.
+### vs Published Baselines (BraTS)
 
-**Intersection over Union (IoU)**
-
-Evaluates the intersection area between prediction and ground truth masks.
-
-**Precision**
-
-Measures the proportion of correctly predicted tumor pixels.
-
-**Recall**
-
-Measures the ability of the model to detect tumor regions.
-
----
-
-## 7. Experimental Results
-
-The model outputs include:
-
-* Original MRI image
-* Ground truth tumor segmentation mask
-* Predicted segmentation mask
-* Overlay visualization highlighting tumor regions
-
-These visual outputs enable qualitative evaluation of model performance.
-
-Example output pipeline:
-
-MRI Image → Segmentation Model → Predicted Tumor Mask → Visualization Overlay
+| Method | NCR/NET | Edema | ET | Mean Dice |
+|--------|---------|-------|----|-----------|
+| Standard 2D U-Net (lit.) | 0.550 | 0.720 | 0.670 | 0.650 |
+| 3D ResU-Net (Myronenko 2018) | 0.810 | 0.840 | 0.800 | 0.820 |
+| **This work (2D U-Net)** | **0.827** | 0.798 | **0.860** | **0.828** |
+| **This work (Attn U-Net)** | 0.820 | **0.803** | 0.859 | 0.828 |
 
 ---
 
-## 8. Applications
+## 🐛 Critical Bug Discovery
 
-The proposed system can assist in:
+> **A modality grouping bug caused ET Dice = 0.000 for all training epochs. Fixed with no model changes.**
 
-* Computer-aided diagnosis
-* Radiology workflow automation
-* Medical image analysis research
-* Clinical decision support systems
+### The Bug
+
+The original loader naively sliced files by alphabetical index:
+
+```python
+# WRONG: groups 4 consecutive FLAIR slices, not 4 modalities
+groups = all_images[i*4 : i*4+4]
+```
+
+Alphabetical sorting orders files **by modality name first**, so `all_images[0:4]` yielded `[flair_000, flair_001, flair_002, flair_003]` — **T1CE was never included in any training batch.**
+
+Since Enhancing Tumor is only visible on T1CE, the model had no signal to learn ET boundaries → ET Dice = 0.000.
+
+A secondary bug: `"t1"` is a substring of `"t1ce"`, so naive string matching misclassifies T1CE files as T1. Fix: check `"t1ce"` before `"t1"`.
+
+### The Fix: Stem-Based Modality Matching
+
+```python
+# For each mask "BraTS2021_00000_000.png", find the matching slice per modality:
+#   BraTS2021_00000_t1_000.png    → Ch0 (T1)
+#   BraTS2021_00000_t1ce_000.png  → Ch1 (T1CE) ← ET signal restored
+#   BraTS2021_00000_t2_000.png    → Ch2 (T2)
+#   BraTS2021_00000_flair_000.png → Ch3 (FLAIR)
+
+slice_key = stem.replace(f"_{mod}_", "_")
+slice_to_mods[slice_key][mod] = img_file
+```
+
+### Impact
+
+| Metric | Before | After | Δ |
+|--------|--------|-------|---|
+| ET Dice | 0.000 🔴 | **0.860** 🟢 | +0.860 |
+| NCR/NET Dice | 0.170 🔴 | **0.827** 🟢 | +0.657 |
+| Edema Dice | 0.004 🔴 | **0.798** 🟢 | +0.794 |
+| Mean Dice | 0.174 🔴 | **0.828** 🟢 | +0.654 |
 
 ---
 
-## 9. Limitations
+## 🏗️ Architecture
 
-Some limitations of the current approach include:
+**Attention U-Net** — Input: `(B, 4, 240, 240)` → Output: `(B, 4, 240, 240)` 4-class probability map
 
-* Dependence on dataset size
-* Variability in MRI acquisition parameters
-* Limited generalization across different hospitals or scanners
+- Encoder: 4→64→128→256→512 with MaxPool 2×2
+- Decoder: Upsample + Attention Gate + skip concatenation at each level
+- Output: 1×1 Conv → 4 classes (Background, NCR/NET, Edema, ET)
 
-Future work can address these limitations through larger datasets and advanced architectures.
+**Tumor Profile Classifier** — CNN predicting severity (No Tumor / Edema Only / Core Present / Full Tumor) from T1CE slice.
 
----
-
-## 10. Future Work
-
-Potential improvements include:
-
-* Implementing **Attention U-Net**
-* Exploring **3D CNN-based segmentation models**
-* Multi-class segmentation of tumor subregions
-* Integration of **Explainable AI techniques** for interpretability
+**LGG/HGG Grade Classifier** — ResNet-18 fine-tuned for binary grade prediction; first conv adapted from 3→1 channel for grayscale T1CE input.
 
 ---
 
-## 11. Project Structure
+## 📁 Dataset
 
-```id="kjf94a"
-Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
-.
-├── brain_seg_env
-├── configs
-│   ├── config.py
-│   └── __pycache__
-├── data
-│   ├── test
-│   ├── train
-│   └── val
-├── LICENSE
-├── main.py
-├── notebook
-│   └── data_processing.ipynb
-├
-├── README.md
-├── requirements.txt
-└── src
-    ├── datasets
-    ├── evaluation
-    ├── inference
-    ├── models
-    ├── __pycache__
-    ├── training
-    └── visualization
+**BraTS 2021** — 4 MRI modalities per patient, PNG format, 240×240, 4 mask classes.
 
+| Modality | Role |
+|----------|------|
+| T1 | Anatomical reference |
+| **T1CE** | **Enhancing Tumor** — bright contrast enhancement |
+| T2 | Edema, fluid content |
+| FLAIR | Peritumoral edema, suppresses CSF |
 
+**BraTS 2021** (grade classification) — 75,487 slices total (43% LGG / 57% HGG).
+
+> Raw BraTS ET label `4` is remapped to `3` during preprocessing.
+
+---
+
+## ⚙️ Training
+
+| Parameter | Value |
+|-----------|-------|
+| Batch Size | 16 |
+| Epochs | 75 (segmentation) · 30 (classifiers) |
+| Optimizer | Adam, lr=1×10⁻⁴ |
+| LR Scheduler | StepLR (step=10, γ=0.5) |
+| Loss | Dice Loss + Cross-Entropy |
+| Augmentation | Flip, Rotate, Brightness/Contrast, Affine, Gaussian Noise |
+
+Preprocessing: Z-score normalization on brain-masked pixels per channel; BraTS label 4→3 remapping.
+
+---
+
+## 🚀 Getting Started
+
+```bash
+git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
+cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
+pip install -r requirements.txt
+
+# Train
+python main.py --mode train --model attn_unet_multiclass
+
+# Evaluate
+python main.py --mode eval --model attn_unet_multiclass --checkpoint path/to/checkpoint.pth
+
+# Web app
+streamlit run app.py
+```
+
+Upload files using the naming convention: `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Use middle slices (035–065) for best visibility.
+
+---
+
+## 📂 Project Structure
+
+```
+├── configs/config.py
+├── data/train · val · test
+├── src/
+│   ├── datasets/      # Stem-based modality matching loader
+│   ├── models/        # U-Net, Attention U-Net, ResNet-18
+│   ├── training/
+│   ├── evaluation/
+│   ├── inference/
+│   └── visualization/
+├── notebook/data_processing.ipynb
+├── app.py             # Streamlit interface
+└── main.py
 ```
 
 ---
 
-## 12. Technologies Used
+## ⚠️ Limitations & Future Work
 
-* Python
-* PyTorch
-* OpenCV
-* NumPy
-* Matplotlib
-* Albumentations
-* segmentation-models-pytorch
+**Limitations:** 2D slice processing loses volumetric context · mild overfitting in late epochs · PNG vs NIfTI distribution shift for clinical deployment.
+
+**Future:** 3D volumetric segmentation · TransUNet / Swin-UNet · GradCAM explainability · multi-scanner domain adaptation · Docker deployment.
 
 ---
 
-## Author
+## 📄 References
 
-Rajani Lamichhane
-Machine Learning Engineer | Computer Vision | Biomedical AI
+1. Ronneberger et al. (2015). *U-Net: Convolutional Networks for Biomedical Image Segmentation.* MICCAI.
+2. Oktay et al. (2018). *Attention U-Net: Learning Where to Look for the Pancreas.* MIDL.
+3. He et al. (2016). *Deep Residual Learning for Image Recognition.* CVPR.
+4. Myronenko (2018). *3D MRI Brain Tumor Segmentation Using Autoencoder Regularization.* BraTS @ MICCAI.
+5. Baid et al. (2021). *The RSNA-ASNR-MICCAI BraTS 2021 Benchmark.* arXiv:2107.02314.
 
+---
+
+## 👤 Author
+
+**Rajani Lamichhane** · Machine Learning Engineer · Computer Vision · Biomedical AI
+
+<div align="center"><br>
+<i>If this project helped your research, consider giving it a ⭐</i>
+</div>
