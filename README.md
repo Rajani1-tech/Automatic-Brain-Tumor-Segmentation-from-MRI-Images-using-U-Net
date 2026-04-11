@@ -1,232 +1,291 @@
-# 🧠 Automatic Brain Tumor Segmentation from MRI Images
+# Automatic Brain Tumor Segmentation from MRI Images
 
 <div align="center">
 
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![BraTS2021](https://img.shields.io/badge/Dataset-BraTS%202021-blue)](https://www.synapse.org/brats2021)
+[![Dataset](https://img.shields.io/badge/Dataset-BraTS%202021-blue)](https://www.synapse.org/brats2021)
 [![Mean Dice](https://img.shields.io/badge/Mean%20Dice-0.828-brightgreen)]()
 [![ET Dice](https://img.shields.io/badge/ET%20Dice-0.860-brightgreen)]()
-[![Streamlit](https://img.shields.io/badge/App-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Streamlit](https://img.shields.io/badge/Demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**An End-to-End Deep Learning Pipeline for Multiclass Brain Tumor Segmentation and Grade Classification from Multi-Modal MRI**
+<br>
 
-*Rajani Lamichhane · Machine Learning Engineer · Computer Vision · Biomedical AI*
+**An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI, achieving Mean Dice 0.828 and ET Dice 0.860 — competitive with published 3D architectures.**
+
+<br>
+
+*Rajani Lamichhane — Machine Learning Engineer · Computer Vision · Biomedical AI*
 
 </div>
 
 ---
 
-## 📋 Overview
+## Abstract
 
-This project presents a fully automated framework for **multiclass brain tumor segmentation** and **LGG/HGG grade prediction** from multi-modal MRI scans using the BraTS 2021 dataset.
+Brain tumor segmentation from MRI is a critical yet time-consuming clinical task prone to inter-observer variability. This project presents a fully automated pipeline that performs pixel-level multiclass segmentation of three tumor subregions — Necrotic Core/Non-Enhancing Tumor (NCR/NET), Peritumoral Edema, and Enhancing Tumor (ET) — followed by tumor severity classification and LGG/HGG grade prediction, all from four-modality MRI input.
 
-```
-4-Modality MRI Input (T1, T1CE, T2, FLAIR)
-            ↓
-  Attention U-Net Multiclass Segmentation
-            ↓
- Region Analysis (NCR/NET · Edema · Enhancing Tumor)
-            ↓
-     Tumor Profile Classification + LGG/HGG Grade Prediction
-            ↓
-       Streamlit Clinical Web Interface
-```
-
-| Metric | Value |
-|--------|-------|
-| Mean Dice | **0.828** |
-| Enhancing Tumor Dice | **0.860** |
-| NCR/NET Dice | **0.827** |
-| Edema Dice | **0.798** |
-
-> 🏆 ET Dice **0.860** surpasses 3D ResU-Net (0.800) — at significantly lower computational cost.
+A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET Dice 0.860**, surpassing published 3D architectures at significantly lower computational cost. A critical data pipeline bug discovered during development — where naive alphabetical file slicing caused T1CE to be absent from all training batches — is fully documented. Fixing it improved ET Dice from **0.000 to 0.860** without any architectural changes, demonstrating that correct data assembly can matter more than model sophistication.
 
 ---
 
-## 🔬 Research Highlights
+## Pipeline
 
-**1. Critical Data Pipeline Bug → +0.654 Mean Dice with zero architectural changes** (see [§ Bug Discovery](#-critical-bug-discovery))
-
-**2. Attention gates provide no measurable benefit** (Δ Mean Dice: 0.001) when multi-modal input already provides strong spatial discriminative signal via T1CE.
-
-**3. Correct 2D multi-modal assembly matches 3D architecture performance** — data quality matters more than model complexity.
+```
+Multi-Modal MRI Input  →  Attention U-Net  →  Segmentation Mask
+  T1, T1CE, T2, FLAIR     (Multiclass)        NCR/NET · Edema · ET
+                                ↓
+                     Tumor Profile Classifier
+                     (No Tumor / Edema Only /
+                      Core Present / Full Tumor)
+                                ↓
+                      LGG / HGG Classifier
+                                ↓
+                    Streamlit Web Interface
+```
 
 ---
 
-## 📊 Results
+## Results
 
-### Model Comparison
+### Segmentation Performance
 
 | Model | Mean Dice | Mean IoU | Accuracy |
-|-------|-----------|----------|----------|
+|-------|:---------:|:--------:|:--------:|
 | U-Net Binary | 0.146 | 0.096 | 0.941 |
-| Attn U-Net Binary | 0.141 | 0.092 | 0.944 |
+| Attention U-Net Binary | 0.141 | 0.092 | 0.944 |
 | U-Net Multiclass | **0.828** | **0.763** | 0.993 |
-| Attn U-Net Multiclass | **0.828** | **0.763** | **0.993** |
+| Attention U-Net Multiclass | **0.828** | **0.763** | **0.993** |
 
-### vs Published Baselines (BraTS)
+### Comparison with Published Baselines
 
 | Method | NCR/NET | Edema | ET | Mean Dice |
-|--------|---------|-------|----|-----------|
-| Standard 2D U-Net (lit.) | 0.550 | 0.720 | 0.670 | 0.650 |
-| 3D ResU-Net (Myronenko 2018) | 0.810 | 0.840 | 0.800 | 0.820 |
-| **This work (2D U-Net)** | **0.827** | 0.798 | **0.860** | **0.828** |
-| **This work (Attn U-Net)** | 0.820 | **0.803** | 0.859 | 0.828 |
+|--------|:-------:|:-----:|:--:|:---------:|
+| Standard 2D U-Net (literature) | 0.550 | 0.720 | 0.670 | 0.650 |
+| 3D ResU-Net — Myronenko (2018) | 0.810 | 0.840 | 0.800 | 0.820 |
+| **This work — 2D U-Net** | **0.827** | 0.798 | **0.860** | **0.828** |
+| **This work — Attention U-Net** | 0.820 | **0.803** | 0.859 | **0.828** |
+
+> A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs 0.800). Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting that T1CE already provides sufficient spatial discriminative signal for ET localization.
 
 ---
 
-## 🐛 Critical Bug Discovery
+## Key Finding — Critical Data Pipeline Bug
 
-> **A modality grouping bug caused ET Dice = 0.000 for all training epochs. Fixed with no model changes.**
+> **ET Dice was 0.000 for all training epochs. The entire improvement to 0.860 came from fixing one line of data loading code.**
 
-### The Bug
+### Root Cause
 
-The original loader naively sliced files by alphabetical index:
+The original dataset loader grouped files by naive alphabetical index slicing:
 
 ```python
-# WRONG: groups 4 consecutive FLAIR slices, not 4 modalities
+# WRONG — alphabetical sorting orders by modality name, not by slice
 groups = all_images[i*4 : i*4+4]
+# Result: [flair_000, flair_001, flair_002, flair_003]
+# T1CE is never included in any training batch
 ```
 
-Alphabetical sorting orders files **by modality name first**, so `all_images[0:4]` yielded `[flair_000, flair_001, flair_002, flair_003]` — **T1CE was never included in any training batch.**
+Because alphabetical order places all FLAIR slices before T1 and T1CE slices, every training sample received four consecutive FLAIR slices from different brain positions — never the four required modalities. Since Enhancing Tumor is only detectable on T1CE, the model had no signal to learn ET boundaries.
 
-Since Enhancing Tumor is only visible on T1CE, the model had no signal to learn ET boundaries → ET Dice = 0.000.
+A secondary bug: `"t1"` is a substring of `"t1ce"`, causing naive string matching to misclassify T1CE files as T1. Fixed by checking `"t1ce"` before `"t1"`.
 
-A secondary bug: `"t1"` is a substring of `"t1ce"`, so naive string matching misclassifies T1CE files as T1. Fix: check `"t1ce"` before `"t1"`.
-
-### The Fix: Stem-Based Modality Matching
+### Fix — Stem-Based Modality Matching
 
 ```python
-# For each mask "BraTS2021_00000_000.png", find the matching slice per modality:
-#   BraTS2021_00000_t1_000.png    → Ch0 (T1)
-#   BraTS2021_00000_t1ce_000.png  → Ch1 (T1CE) ← ET signal restored
-#   BraTS2021_00000_t2_000.png    → Ch2 (T2)
-#   BraTS2021_00000_flair_000.png → Ch3 (FLAIR)
+# For each mask file e.g. "BraTS2021_00000_000.png"
+# find the correct modality image for that exact slice:
 
 slice_key = stem.replace(f"_{mod}_", "_")
 slice_to_mods[slice_key][mod] = img_file
+
+# Guarantees:
+#   BraTS2021_00000_t1_000.png    → Ch0  T1
+#   BraTS2021_00000_t1ce_000.png  → Ch1  T1CE  ← ET signal restored
+#   BraTS2021_00000_t2_000.png    → Ch2  T2
+#   BraTS2021_00000_flair_000.png → Ch3  FLAIR
 ```
 
 ### Impact
 
-| Metric | Before | After | Δ |
-|--------|--------|-------|---|
-| ET Dice | 0.000 🔴 | **0.860** 🟢 | +0.860 |
-| NCR/NET Dice | 0.170 🔴 | **0.827** 🟢 | +0.657 |
-| Edema Dice | 0.004 🔴 | **0.798** 🟢 | +0.794 |
-| Mean Dice | 0.174 🔴 | **0.828** 🟢 | +0.654 |
+| Metric | Before Fix | After Fix | Δ |
+|--------|:----------:|:---------:|:-:|
+| Enhancing Tumor Dice | 0.000 | **0.860** | +0.860 |
+| NCR/NET Dice | 0.170 | **0.827** | +0.657 |
+| Edema Dice | 0.004 | **0.798** | +0.794 |
+| Mean Dice | 0.174 | **0.828** | +0.654 |
+
+*No architectural changes. No hyperparameter tuning. Pure data pipeline fix.*
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-**Attention U-Net** — Input: `(B, 4, 240, 240)` → Output: `(B, 4, 240, 240)` 4-class probability map
+### Segmentation — Attention U-Net
 
-- Encoder: 4→64→128→256→512 with MaxPool 2×2
-- Decoder: Upsample + Attention Gate + skip concatenation at each level
-- Output: 1×1 Conv → 4 classes (Background, NCR/NET, Edema, ET)
+A 2D encoder–decoder with attention gates on skip connections, trained on 4-channel multi-modal input.
 
-**Tumor Profile Classifier** — CNN predicting severity (No Tumor / Edema Only / Core Present / Full Tumor) from T1CE slice.
+```
+Input  (B, 4, 240, 240)   — T1 · T1CE · T2 · FLAIR
+  ↓ Encoder   4 → 64 → 128 → 256 → 512   (MaxPool 2×2)
+  ↓ Bottleneck            512-dim
+  ↓ Decoder   Upsample + Attention Gate + Skip Concat
+Output (B, 4, 240, 240)   — per-pixel class probabilities
+                            argmax → segmentation mask
+```
 
-**LGG/HGG Grade Classifier** — ResNet-18 fine-tuned for binary grade prediction; first conv adapted from 3→1 channel for grayscale T1CE input.
+Classes: Background · NCR/NET · Edema · Enhancing Tumor
+
+### Grade Classification — ResNet-18
+
+ResNet-18 fine-tuned for binary LGG/HGG prediction. First convolution adapted from 3-channel to 1-channel for grayscale T1CE input. Trained with Weighted Cross-Entropy to handle class imbalance (43% LGG / 57% HGG).
+
+### Tumor Profile Classifier
+
+A lightweight CNN predicting overall tumor severity from a single T1CE slice across four ordinal classes: No Tumor → Edema Only → Core Present → Full Tumor.
 
 ---
 
-## 📁 Dataset
+## Dataset
 
-**BraTS 2021** — 4 MRI modalities per patient, PNG format, 240×240, 4 mask classes.
+**BraTS 2021** is used for all three models — segmentation, profile classification, and grade prediction.
 
-| Modality | Role |
-|----------|------|
+| Property | Value |
+|----------|-------|
+| Modalities | T1, T1CE, T2, FLAIR |
+| Format | PNG (converted from NIfTI) |
+| Resolution | 240 × 240 |
+| Segmentation classes | Background · NCR/NET · Edema · ET |
+| Grade split | 43% LGG · 57% HGG (75,487 slices) |
+
+**MRI Modality Roles**
+
+| Modality | Clinical Role |
+|----------|--------------|
 | T1 | Anatomical reference |
-| **T1CE** | **Enhancing Tumor** — bright contrast enhancement |
-| T2 | Edema, fluid content |
-| FLAIR | Peritumoral edema, suppresses CSF |
+| **T1CE** | **Enhancing Tumor** — gadolinium contrast enhancement |
+| T2 | Edema and fluid content |
+| FLAIR | Peritumoral edema, CSF suppressed |
 
-**BraTS 2021** (grade classification) — 75,487 slices total (43% LGG / 57% HGG).
-
-> Raw BraTS ET label `4` is remapped to `3` during preprocessing.
+> Raw BraTS label `4` (Enhancing Tumor) is remapped to `3` during preprocessing.
 
 ---
 
-## ⚙️ Training
+## Training Configuration
 
-| Parameter | Value |
-|-----------|-------|
-| Batch Size | 16 |
-| Epochs | 75 (segmentation) · 30 (classifiers) |
-| Optimizer | Adam, lr=1×10⁻⁴ |
-| LR Scheduler | StepLR (step=10, γ=0.5) |
-| Loss | Dice Loss + Cross-Entropy |
-| Augmentation | Flip, Rotate, Brightness/Contrast, Affine, Gaussian Noise |
+| Parameter | Segmentation | Classifiers |
+|-----------|:------------:|:-----------:|
+| Epochs | 75 | 30 |
+| Batch size | 16 | 16 |
+| Optimizer | Adam | Adam |
+| Learning rate | 1×10⁻⁴ | 1×10⁻⁴ |
+| LR scheduler | StepLR (step=10, γ=0.5) | StepLR |
+| Loss | Dice + Cross-Entropy | Weighted Cross-Entropy |
 
-Preprocessing: Z-score normalization on brain-masked pixels per channel; BraTS label 4→3 remapping.
+**Preprocessing:** Z-score normalization per channel over brain-masked pixels. Brain mask threshold: intensity > 0.1 after /255 scaling.
+
+**Augmentation:** Horizontal/vertical flip · Random 90° rotation · Brightness & contrast · Gaussian noise · Affine transforms. All spatial augmentations applied identically across all 4 channels and the mask to preserve alignment.
 
 ---
 
-## 🚀 Getting Started
+## Web Application
+
+A Streamlit interface provides real-time end-to-end analysis from raw MRI upload to grade prediction.
+
+**Capabilities**
+- Upload all 4 modalities with validation and duplicate detection
+- Color-coded segmentation overlay with region pixel statistics
+- Tumor severity profile with class probability bars
+- LGG/HGG grade prediction with clinical reasoning
+- Attention heatmap visualization
+
+```bash
+streamlit run app.py
+```
+
+Upload files following the BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Middle slices (035–065) show the most complete tumor core.
+
+---
+
+## Project Structure
+
+```
+├── configs/
+│   └── config.py
+├── data/
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── src/
+│   ├── datasets/        # Stem-based modality matching loader
+│   ├── models/          # U-Net, Attention U-Net, ResNet-18
+│   ├── training/
+│   ├── evaluation/
+│   ├── inference/
+│   └── visualization/
+├── notebook/
+│   └── data_processing.ipynb
+├── app.py               # Streamlit clinical interface
+├── main.py
+└── requirements.txt
+```
+
+---
+
+## Getting Started
 
 ```bash
 git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
 cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
 pip install -r requirements.txt
+```
 
-# Train
+```bash
+# Train segmentation model
 python main.py --mode train --model attn_unet_multiclass
 
 # Evaluate
 python main.py --mode eval --model attn_unet_multiclass --checkpoint path/to/checkpoint.pth
 
-# Web app
+# Launch web app
 streamlit run app.py
 ```
 
-Upload files using the naming convention: `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Use middle slices (035–065) for best visibility.
+---
+
+## Limitations
+
+- **2D processing** — slice-level inference loses volumetric context across adjacent slices
+- **Overfitting** — training and validation Dice diverge in later epochs; additional regularization warranted
+- **Distribution shift** — PNG-converted slices may differ from native NIfTI used in clinical scanners
+
+## Future Work
+
+- 3D volumetric segmentation on full NIfTI volumes
+- Transformer-based architectures — TransUNet, Swin-UNet
+- GradCAM / SHAP explainability per modality
+- Multi-scanner domain adaptation
+- Docker containerization for portable clinical deployment
 
 ---
 
-## 📂 Project Structure
+## References
 
-```
-├── configs/config.py
-├── data/train · val · test
-├── src/
-│   ├── datasets/      # Stem-based modality matching loader
-│   ├── models/        # U-Net, Attention U-Net, ResNet-18
-│   ├── training/
-│   ├── evaluation/
-│   ├── inference/
-│   └── visualization/
-├── notebook/data_processing.ipynb
-├── app.py             # Streamlit interface
-└── main.py
-```
+1. Ronneberger, O., Fischer, P., & Brox, T. (2015). *U-Net: Convolutional Networks for Biomedical Image Segmentation.* MICCAI.
+2. Oktay, O., et al. (2018). *Attention U-Net: Learning Where to Look for the Pancreas.* MIDL.
+3. He, K., et al. (2016). *Deep Residual Learning for Image Recognition.* CVPR.
+4. Myronenko, A. (2018). *3D MRI Brain Tumor Segmentation Using Autoencoder Regularization.* BraTS @ MICCAI.
+5. Baid, U., et al. (2021). *The RSNA-ASNR-MICCAI BraTS 2021 Benchmark.* arXiv:2107.02314.
+6. Menze, B. H., et al. (2015). *The Multimodal Brain Tumor Image Segmentation Benchmark.* IEEE TMI, 34(10).
 
 ---
 
-## ⚠️ Limitations & Future Work
+## Author
 
-**Limitations:** 2D slice processing loses volumetric context · mild overfitting in late epochs · PNG vs NIfTI distribution shift for clinical deployment.
-
-**Future:** 3D volumetric segmentation · TransUNet / Swin-UNet · GradCAM explainability · multi-scanner domain adaptation · Docker deployment.
-
----
-
-## 📄 References
-
-1. Ronneberger et al. (2015). *U-Net: Convolutional Networks for Biomedical Image Segmentation.* MICCAI.
-2. Oktay et al. (2018). *Attention U-Net: Learning Where to Look for the Pancreas.* MIDL.
-3. He et al. (2016). *Deep Residual Learning for Image Recognition.* CVPR.
-4. Myronenko (2018). *3D MRI Brain Tumor Segmentation Using Autoencoder Regularization.* BraTS @ MICCAI.
-5. Baid et al. (2021). *The RSNA-ASNR-MICCAI BraTS 2021 Benchmark.* arXiv:2107.02314.
+**Rajani Lamichhane**  
+Machine Learning Engineer · Computer Vision · Biomedical AI
 
 ---
 
-## 👤 Author
-
-**Rajani Lamichhane** · Machine Learning Engineer · Computer Vision · Biomedical AI
-
-<div align="center"><br>
-<i>If this project helped your research, consider giving it a ⭐</i>
+<div align="center">
+<sub>If this work helped your research, please consider giving it a ⭐</sub>
 </div>
