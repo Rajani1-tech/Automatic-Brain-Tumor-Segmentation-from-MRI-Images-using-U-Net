@@ -36,31 +36,15 @@ A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET
 
 ## Pipeline
 
-![Pipeline diagram](docs/attention_unet_architecture.svg)
+![Pipeline diagram](docs/pipeline_overview.svg)
 
-```
-Multi-modal MRI (T1, T1CE, T2, FLAIR)
-        ↓
-  Attention U-Net  →  Segmentation mask (NCR/NET · Edema · ET)
-        ↓
-  Tumor profile classifier  →  LGG/HGG grade classifier
-        ↓
-    Streamlit clinical web interface
-```
 
----
 
 ## Architecture — Attention U-Net
 
 ![Attention U-Net architecture](docs/attention_unet_architecture.svg)
 
-| Stage | Detail |
-|-------|--------|
-| Input | `(B, 4, 240, 240)` — T1, T1CE, T2, FLAIR stacked as channels |
-| Encoder | 4 → 64 → 128 → 256 → 512 via conv blocks + MaxPool 2×2 |
-| Bottleneck | 512-dim feature representation |
-| Decoder | Upsample + Attention Gate + skip concatenation at each level |
-| Output | `(B, 4, 240, 240)` per-pixel probabilities → argmax → mask |
+
 
 **Tumor Profile Classifier** — CNN predicting severity (No Tumor / Edema Only / Core Present / Full Tumor) from T1CE slice.
 
