@@ -28,3 +28,7 @@ __pycache__/
 *.pyc
 dataset/
 *.zip
+brain_seg_env/
+*.h5
+*.so
+models/
