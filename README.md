@@ -8,6 +8,7 @@
 [![ET Dice](https://img.shields.io/badge/ET%20Dice-0.860-brightgreen)]()
 [![Streamlit](https://img.shields.io/badge/Demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Report](https://img.shields.io/badge/Report-PDF-orange?logo=adobeacrobatreader&logoColor=white)](https://YOUR_OVERLEAF_OR_PDF_LINK_HERE)
 
 <br>
 
@@ -16,6 +17,10 @@
 <br>
 
 *Rajani Lamichhane — Machine Learning Engineer · Computer Vision · Biomedical AI*
+
+<br>
+
+📄 **[Read the full technical report (PDF)](https://YOUR_OVERLEAF_OR_PDF_LINK_HERE)** — architecture details, bug analysis, training curves, and extended results.
 
 </div>
 
@@ -31,24 +36,41 @@ A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET
 
 ## Pipeline
 
+![Pipeline diagram](docs/pipeline.png)
+
 ```
-Multi-Modal MRI Input  →  Attention U-Net  →  Segmentation Mask
-  T1, T1CE, T2, FLAIR     (Multiclass)        NCR/NET · Edema · ET
-                                ↓
-                     Tumor Profile Classifier
-                     (No Tumor / Edema Only /
-                      Core Present / Full Tumor)
-                                ↓
-                      LGG / HGG Classifier
-                                ↓
-                    Streamlit Web Interface
+Multi-modal MRI (T1, T1CE, T2, FLAIR)
+        ↓
+  Attention U-Net  →  Segmentation mask (NCR/NET · Edema · ET)
+        ↓
+  Tumor profile classifier  →  LGG/HGG grade classifier
+        ↓
+    Streamlit clinical web interface
 ```
+
+---
+
+## Architecture — Attention U-Net
+
+![Attention U-Net architecture](docs/unet_architecture.png)
+
+| Stage | Detail |
+|-------|--------|
+| Input | `(B, 4, 240, 240)` — T1, T1CE, T2, FLAIR stacked as channels |
+| Encoder | 4 → 64 → 128 → 256 → 512 via conv blocks + MaxPool 2×2 |
+| Bottleneck | 512-dim feature representation |
+| Decoder | Upsample + Attention Gate + skip concatenation at each level |
+| Output | `(B, 4, 240, 240)` per-pixel probabilities → argmax → mask |
+
+**Tumor Profile Classifier** — CNN predicting severity (No Tumor / Edema Only / Core Present / Full Tumor) from T1CE slice.
+
+**LGG/HGG Grade Classifier** — ResNet-18 fine-tuned for binary grade prediction; first conv adapted from 3→1 channel for grayscale T1CE input.
 
 ---
 
 ## Results
 
-### Segmentation Performance
+### Model Comparison
 
 | Model | Mean Dice | Mean IoU | Accuracy |
 |-------|:---------:|:--------:|:--------:|
@@ -66,7 +88,7 @@ Multi-Modal MRI Input  →  Attention U-Net  →  Segmentation Mask
 | **This work — 2D U-Net** | **0.827** | 0.798 | **0.860** | **0.828** |
 | **This work — Attention U-Net** | 0.820 | **0.803** | 0.859 | **0.828** |
 
-> A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs 0.800). Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting that T1CE already provides sufficient spatial discriminative signal for ET localization.
+> A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs 0.800). Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting T1CE already provides sufficient spatial discriminative signal for ET localization.
 
 ---
 
@@ -85,7 +107,7 @@ groups = all_images[i*4 : i*4+4]
 # T1CE is never included in any training batch
 ```
 
-Because alphabetical order places all FLAIR slices before T1 and T1CE slices, every training sample received four consecutive FLAIR slices from different brain positions — never the four required modalities. Since Enhancing Tumor is only detectable on T1CE, the model had no signal to learn ET boundaries.
+Because alphabetical order places all FLAIR slices before T1 and T1CE slices, every training sample received four consecutive FLAIR slices — never the four required modalities. Since Enhancing Tumor is only detectable on T1CE, the model had no signal to learn ET boundaries.
 
 A secondary bug: `"t1"` is a substring of `"t1ce"`, causing naive string matching to misclassify T1CE files as T1. Fixed by checking `"t1ce"` before `"t1"`.
 
@@ -118,33 +140,6 @@ slice_to_mods[slice_key][mod] = img_file
 
 ---
 
-## Architecture
-
-### Segmentation — Attention U-Net
-
-A 2D encoder–decoder with attention gates on skip connections, trained on 4-channel multi-modal input.
-
-```
-Input  (B, 4, 240, 240)   — T1 · T1CE · T2 · FLAIR
-  ↓ Encoder   4 → 64 → 128 → 256 → 512   (MaxPool 2×2)
-  ↓ Bottleneck            512-dim
-  ↓ Decoder   Upsample + Attention Gate + Skip Concat
-Output (B, 4, 240, 240)   — per-pixel class probabilities
-                            argmax → segmentation mask
-```
-
-Classes: Background · NCR/NET · Edema · Enhancing Tumor
-
-### Grade Classification — ResNet-18
-
-ResNet-18 fine-tuned for binary LGG/HGG prediction. First convolution adapted from 3-channel to 1-channel for grayscale T1CE input. Trained with Weighted Cross-Entropy to handle class imbalance (43% LGG / 57% HGG).
-
-### Tumor Profile Classifier
-
-A lightweight CNN predicting overall tumor severity from a single T1CE slice across four ordinal classes: No Tumor → Edema Only → Core Present → Full Tumor.
-
----
-
 ## Dataset
 
 **BraTS 2021** is used for all three models — segmentation, profile classification, and grade prediction.
@@ -155,9 +150,7 @@ A lightweight CNN predicting overall tumor severity from a single T1CE slice acr
 | Format | PNG (converted from NIfTI) |
 | Resolution | 240 × 240 |
 | Segmentation classes | Background · NCR/NET · Edema · ET |
-| Grade split | 43% LGG · 57% HGG (75,487 slices) |
-
-**MRI Modality Roles**
+| Grade split | 43% LGG · 57% HGG — 75,487 slices total |
 
 | Modality | Clinical Role |
 |----------|--------------|
@@ -181,7 +174,7 @@ A lightweight CNN predicting overall tumor severity from a single T1CE slice acr
 | LR scheduler | StepLR (step=10, γ=0.5) | StepLR |
 | Loss | Dice + Cross-Entropy | Weighted Cross-Entropy |
 
-**Preprocessing:** Z-score normalization per channel over brain-masked pixels. Brain mask threshold: intensity > 0.1 after /255 scaling.
+**Preprocessing:** Z-score normalization per channel over brain-masked pixels (threshold > 0.1 after /255 scaling).
 
 **Augmentation:** Horizontal/vertical flip · Random 90° rotation · Brightness & contrast · Gaussian noise · Affine transforms. All spatial augmentations applied identically across all 4 channels and the mask to preserve alignment.
 
@@ -191,12 +184,7 @@ A lightweight CNN predicting overall tumor severity from a single T1CE slice acr
 
 A Streamlit interface provides real-time end-to-end analysis from raw MRI upload to grade prediction.
 
-**Capabilities**
-- Upload all 4 modalities with validation and duplicate detection
-- Color-coded segmentation overlay with region pixel statistics
-- Tumor severity profile with class probability bars
-- LGG/HGG grade prediction with clinical reasoning
-- Attention heatmap visualization
+**Capabilities:** color-coded segmentation overlay · region pixel statistics · tumor severity profile · LGG/HGG grade prediction with clinical reasoning · attention heatmap visualization.
 
 ```bash
 streamlit run app.py
@@ -209,22 +197,27 @@ Upload files following the BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.p
 ## Project Structure
 
 ```
+├── assets/                  # Diagram images for README
+│   ├── pipeline.png
+│   └── unet_architecture.png
 ├── configs/
 │   └── config.py
 ├── data/
 │   ├── train/
 │   ├── val/
 │   └── test/
+├── docs/
+│   └── report.pdf           # Full technical report
 ├── src/
-│   ├── datasets/        # Stem-based modality matching loader
-│   ├── models/          # U-Net, Attention U-Net, ResNet-18
+│   ├── datasets/            # Stem-based modality matching loader
+│   ├── models/              # U-Net, Attention U-Net, ResNet-18
 │   ├── training/
 │   ├── evaluation/
 │   ├── inference/
 │   └── visualization/
 ├── notebook/
 │   └── data_processing.ipynb
-├── app.py               # Streamlit clinical interface
+├── app.py                   # Streamlit clinical interface
 ├── main.py
 └── requirements.txt
 ```
@@ -265,6 +258,19 @@ streamlit run app.py
 - GradCAM / SHAP explainability per modality
 - Multi-scanner domain adaptation
 - Docker containerization for portable clinical deployment
+
+---
+
+## Technical Report
+
+The full project report is written in LaTeX and covers extended methodology, training curves, ablation studies, and the complete bug analysis.
+
+📄 **[Open report (PDF)](https://www.overleaf.com/read/xcwqggrmftng#c98b9d)** — opens in a new browser tab.
+
+
+>
+> **To link a PDF in the repo:** Commit `docs/report.pdf` to your repository, then replace the link with:
+> `https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net/docs/report.pdf`
 
 ---
 
