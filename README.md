@@ -227,6 +227,16 @@ slice_to_mods[slice_key][mod] = img_file
 | **This work — 2D U-Net** | **0.827** | 0.798 | **0.860** | **0.828** |
 | **This work — Attention U-Net** | 0.820 | **0.803** | 0.859 | **0.828** |
 
+## 6.3 Qualitative Results
+
+### Example 1 — HGG
+[![HGG Segmentation — click for details](docs/paper_figure copy 2.png)](docs/figures/hgg_example_details.md)
+<sub>Click the figure to see full prediction details — grade, region breakdown, Dice scores.</sub>
+
+### Example 2 — LGG
+[![LGG Segmentation — click for details](docs/paper_figure.png)](docs/figures/lgg_example_details.md)
+<sub>Click the figure to see full prediction details.</sub>
+
 **Key observations:**
 - A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs. 0.800)
 - Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting T1CE already provides sufficient spatial discriminative signal for ET localization without additional gating
