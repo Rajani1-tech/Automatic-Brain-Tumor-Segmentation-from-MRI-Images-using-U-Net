@@ -14,13 +14,12 @@
 
 **An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI — achieving Mean Dice 0.828 and ET Dice 0.860, competitive with published 3D architectures.**
 
-<br>
 
-*Rajani Lamichhane · Machine Learning Engineer · Computer Vision · Biomedical AI*
+## Demo
 
-<br>
+![NeuroScan AI Demo](docs/figures/demo.gif)
 
-📄 [Read the full technical report (PDF)](docs/brain_tumour_seg_documents.pdf) — architecture details, training curves, bug analysis, and extended results.
+<!-- 📄 [Read the full technical report (PDF)](docs/brain_tumour_seg_documents.pdf) — architecture details, training curves, bug analysis, and extended results. -->
 
 </div>
 
@@ -339,7 +338,19 @@ streamlit run app.py
 6. Menze, B. H., et al. (2015). *The Multimodal Brain Tumor Image Segmentation Benchmark.* IEEE TMI, 34(10).
 
 ---
+## Citation
 
+If this work helped your research or coursework, please cite:
+
+```bibtex
+@misc{lamichhane2025neuroscan,
+  title   = {Automatic Brain Tumor Segmentation from MRI Images using U-Net},
+  author  = {Lamichhane, Rajani},
+  year    = {2025},
+  url     = {https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net},
+  note    = {BraTS 2021 · Mean Dice 0.828 · ET Dice 0.860}
+}
+```
 ## Author
 
 **Rajani Lamichhane**  
