@@ -18,9 +18,9 @@
 
 *Rajani Lamichhane · Machine Learning Engineer · Computer Vision · Biomedical AI*
 
+<br>
 
 ![NeuroScan AI Demo](docs/figures/demo.gif)
-
 
 </div>
 
@@ -31,6 +31,45 @@
 Brain tumor segmentation from MRI is a critical yet time-consuming clinical task, prone to significant inter-observer variability. This project presents a fully automated pipeline that performs **pixel-level multiclass segmentation** of three clinically meaningful tumor subregions — Necrotic Core/Non-Enhancing Tumor (NCR/NET), Peritumoral Edema, and Enhancing Tumor (ET) — followed by tumor severity classification and LGG/HGG grade prediction, all from four-modality MRI input.
 
 A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET Dice 0.860**, surpassing published 3D architectures at significantly lower computational cost. A critical data pipeline bug discovered during development — where naive alphabetical file slicing excluded T1CE from all training batches — is thoroughly documented. Fixing it improved ET Dice from **0.000 to 0.860** without any architectural changes, demonstrating that rigorous data engineering can matter more than model sophistication.
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
+cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
+pip install -r requirements.txt
+
+# Train all models
+python main.py
+
+# Evaluate classifiers
+python evaluate_classifiers.py
+
+# Launch clinical web interface
+streamlit run app.py
+```
+
+---
+
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Problem Statement](#2-problem-statement)
+3. [Dataset](#3-dataset)
+4. [Methodology](#4-methodology)
+5. [Critical Finding — Data Pipeline Bug](#5-critical-finding--data-pipeline-bug)
+6. [Results](#6-results)
+7. [Web Application](#7-web-application)
+8. [Limitations](#8-limitations)
+9. [Future Work](#9-future-work)
+10. [Getting Started](#10-getting-started)
+11. [Project Structure](#11-project-structure)
+12. [Reproducibility](#12-reproducibility)
+13. [References](#13-references)
+14. [Acknowledgements](#14-acknowledgements)
+15. [Citation](#15-citation)
 
 ---
 
@@ -88,8 +127,6 @@ Each MRI modality carries distinct clinical information:
 ## 4. Methodology
 
 ### 4.1 Pipeline Overview
-
-The system follows a sequential analysis pipeline:
 
 ![System Pipeline](docs/pipeline_overview.svg)
 
@@ -312,9 +349,6 @@ Click any slice ID to view the full figure, segmentation mask, overlay, and JSON
 
 ---
 
-
-
-
 ## 7. Web Application
 
 A Streamlit interface provides real-time end-to-end analysis from raw MRI upload to grade prediction.
@@ -329,7 +363,8 @@ A Streamlit interface provides real-time end-to-end analysis from raw MRI upload
 streamlit run app.py
 ```
 
-Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Middle slices (035–065) show the most complete tumor core.
+> Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`.
+> Middle slices (035–065) show the most complete tumor core.
 
 ---
 
@@ -353,7 +388,70 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 
 ---
 
-## 10. Reproducibility
+## 10. Getting Started
+
+```bash
+git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
+cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
+pip install -r requirements.txt
+```
+
+```bash
+# Train all models
+python main.py
+
+# Evaluate classifiers and generate plots
+python evaluate_classifiers.py
+
+# Launch clinical web interface
+streamlit run app.py
+```
+
+---
+
+## 11. Project Structure
+
+```
+├── configs/
+│   └── config.py
+├── docs/
+│   ├── pipeline_overview.svg
+│   ├── brain_tumour_seg_documents.pdf
+│   └── figures/
+│       └── demo.gif
+├── outputs/
+│   ├── evaluation/                  # Classifier metrics + plots
+│   │   ├── grade_classifier_confusion_matrix.png
+│   │   ├── grade_classifier_roc_curve.png
+│   │   ├── tumor_profile_classifier_confusion_matrix.png
+│   │   ├── tumor_profile_classifier_per_class_metrics.png
+│   │   ├── tumor_profile_classifier_roc_curve.png
+│   │   └── classifier_metrics.json
+│   └── results/                     # Per-slice prediction outputs
+│       ├── quantitative_results.csv
+│       └── BraTS2021_XXXXX_YYY/
+│           ├── paper_figure.png
+│           ├── segmentation_mask.png
+│           ├── overlay.png
+│           └── report.json
+├── src/
+│   ├── datasets/                    # Stem-based modality-matching loader
+│   ├── models/                      # U-Net, Attention U-Net, ResNet-18
+│   ├── training/
+│   ├── evaluation/
+│   ├── inference/
+│   └── visualization/
+├── notebook/
+│   └── data_processing.ipynb
+├── app.py                           # Streamlit clinical interface
+├── evaluate_classifiers.py          # Classifier evaluation script
+├── main.py                          # Training entry point
+└── requirements.txt
+```
+
+---
+
+## 12. Reproducibility
 
 All results reported on the **held-out validation set** — never used during training or model selection.
 
@@ -408,65 +506,7 @@ python evaluate_classifiers.py
 
 ---
 
-## 11. Project Structure
-
-```
-├── configs/
-│   └── config.py
-├── docs/
-│   ├── pipeline_overview.svg
-│   ├── figures/
-│   │   ├── hgg_example_details.md
-│   │   ├── lgg_example_details.md
-│   │   └── demo.gif
-│   └── brain_tumour_seg_documents.pdf
-├── outputs/
-│   ├── evaluation/                  # Classifier metrics + plots
-│   └── results/                     # Per-slice prediction outputs
-│       └── BraTS2021_XXXXX_YYY/
-│           ├── paper_figure.png
-│           ├── segmentation_mask.png
-│           ├── overlay.png
-│           └── report.json
-├── src/
-│   ├── datasets/                    # Stem-based modality-matching loader
-│   ├── models/                      # U-Net, Attention U-Net, ResNet-18
-│   ├── training/
-│   ├── evaluation/
-│   ├── inference/
-│   └── visualization/
-├── notebook/
-│   └── data_processing.ipynb
-├── app.py                           # Streamlit clinical interface
-├── evaluate_classifiers.py          # Classifier evaluation script
-├── main.py
-└── requirements.txt
-```
-
----
-
-## 12. Getting Started
-
-```bash
-git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
-cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
-pip install -r requirements.txt
-```
-
-```bash
-# Train all models
-python main.py
-
-# Evaluate classifiers
-python evaluate_classifiers.py
-
-# Launch clinical web interface
-streamlit run app.py
-```
-
----
-
-## 13.  References
+## 13. References
 
 1. Ronneberger, O., Fischer, P., & Brox, T. (2015). *U-Net: Convolutional Networks for Biomedical Image Segmentation.* MICCAI.
 2. Oktay, O., et al. (2018). *Attention U-Net: Learning Where to Look for the Pancreas.* MIDL.
@@ -502,7 +542,7 @@ If this work helped your research or coursework, please cite:
 
 ---
 
-## 16. License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
@@ -510,7 +550,7 @@ Copyright (c) 2026 Rajani Lamichhane
 
 ---
 
-## 17. Author
+## Author
 
 **Rajani Lamichhane**
 Machine Learning Engineer · Computer Vision · Biomedical AI
