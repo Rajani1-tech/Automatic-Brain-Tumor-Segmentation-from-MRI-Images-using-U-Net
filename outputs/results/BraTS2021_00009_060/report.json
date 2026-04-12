@@ -1,0 +1,39 @@
+{
+  "slice_id": "BraTS2021_00009_060",
+  "timestamp": "2026-04-13T01:09:56.340789",
+  "grade": {
+    "label": "LGG",
+    "confidence": 95.0,
+    "reasons": []
+  },
+  "tumor_profile": {
+    "name": "Full Tumor",
+    "confidence": 99.60975050926208,
+    "probabilities": {
+      "No Tumor": 2.4102597695474515e-10,
+      "Edema Only": 0.0038708271458745003,
+      "Core Present": 3.175306846969761e-05,
+      "Full Tumor": 0.9960975050926208
+    }
+  },
+  "region_features": {
+    "et_ratio": 0.08370044043645326,
+    "core_ratio": 0.08700440519052378,
+    "edema_ratio": 0.9129955937081546,
+    "total_area": 908.000001
+  },
+  "area_stats": {
+    "NCR/NET": {
+      "pixels": 3,
+      "percentage": 0.005
+    },
+    "Edema": {
+      "pixels": 829,
+      "percentage": 1.439
+    },
+    "Enhancing Tumor": {
+      "pixels": 76,
+      "percentage": 0.132
+    }
+  }
+}

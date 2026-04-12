@@ -1,0 +1,8 @@
+slice_id,grade,grade_conf,profile,profile_conf,ncr_pixels,ncr_pct,edema_pixels,edema_pct,et_pixels,et_pct,et_ratio,core_ratio,edema_ratio,figure_path
+BraTS2021_00009_055,LGG,95.0,Edema Only,99.8,0,0.00,671,1.17,0,0.00,0.0000,0.0000,1.0000,outputs/results/BraTS2021_00009_055/paper_figure.png
+BraTS2021_00002_055,HGG,98.0,Full Tumor,100.0,568,0.99,3477,6.04,634,1.10,0.1355,0.2569,0.7431,outputs/results/BraTS2021_00002_055/paper_figure.png
+BraTS2021_00002_055,HGG,98.0,Full Tumor,100.0,568,0.99,3477,6.04,634,1.10,0.1355,0.2569,0.7431,outputs/results/BraTS2021_00002_055/paper_figure.png
+BraTS2021_00009_060,LGG,95.0,Full Tumor,99.6,3,0.01,829,1.44,76,0.13,0.0837,0.0870,0.9130,outputs/results/BraTS2021_00009_060/paper_figure.png
+BraTS2021_00009_036,LGG,95.0,Edema Only,97.4,0,0.00,333,0.58,0,0.00,0.0000,0.0000,1.0000,outputs/results/BraTS2021_00009_036/paper_figure.png
+BraTS2021_00002_071,LGG,95.0,Full Tumor,100.0,18,0.03,2411,4.19,240,0.42,0.0899,0.0967,0.9033,outputs/results/BraTS2021_00002_071/paper_figure.png
+BraTS2021_00002_062,HGG,95.0,Full Tumor,100.0,179,0.31,2688,4.67,569,0.99,0.1656,0.2177,0.7823,outputs/results/BraTS2021_00002_062/paper_figure.png

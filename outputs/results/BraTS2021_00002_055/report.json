@@ -1,0 +1,42 @@
+{
+  "slice_id": "BraTS2021_00002_055",
+  "timestamp": "2026-04-13T01:06:42.103925",
+  "grade": {
+    "label": "HGG",
+    "confidence": 98.0,
+    "reasons": [
+      "Elevated enhancing tumor fraction (ET > 12%)",
+      "Large tumor core relative to total region"
+    ]
+  },
+  "tumor_profile": {
+    "name": "Full Tumor",
+    "confidence": 99.99997615814209,
+    "probabilities": {
+      "No Tumor": 6.727822847387532e-19,
+      "Edema Only": 2.911041860897967e-07,
+      "Core Present": 9.445979110012104e-09,
+      "Full Tumor": 0.9999997615814209
+    }
+  },
+  "region_features": {
+    "et_ratio": 0.13549903822707862,
+    "core_ratio": 0.2568924983421901,
+    "edema_ratio": 0.743107501444089,
+    "total_area": 4679.000001
+  },
+  "area_stats": {
+    "NCR/NET": {
+      "pixels": 568,
+      "percentage": 0.986
+    },
+    "Edema": {
+      "pixels": 3477,
+      "percentage": 6.036
+    },
+    "Enhancing Tumor": {
+      "pixels": 634,
+      "percentage": 1.101
+    }
+  }
+}
