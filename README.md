@@ -312,17 +312,8 @@ Click any slice ID to view the full figure, segmentation mask, overlay, and JSON
 
 ---
 
-### 6.7 Qualitative Results
 
-### Example 1 — HGG
-[![HGG Segmentation — click for details](docs/results.png)](docs/figures/hgg_example_details.md)
-<sub>Click the figure to see full prediction details — grade, region breakdown, Dice scores.</sub>
 
-### Example 2 — LGG
-[![LGG Segmentation — click for details](docs/paper_figure.png)](docs/figures/lgg_example_details.md)
-<sub>Click the figure to see full prediction details.</sub>
-
----
 
 ## 7. Web Application
 
