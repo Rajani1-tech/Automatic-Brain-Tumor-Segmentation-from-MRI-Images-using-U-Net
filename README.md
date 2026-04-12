@@ -353,7 +353,7 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 
 ---
 
-## Reproducibility
+## 10. Reproducibility
 
 All results reported on the **held-out validation set** — never used during training or model selection.
 
@@ -408,7 +408,7 @@ python evaluate_classifiers.py
 
 ---
 
-## Project Structure
+## 11. Project Structure
 
 ```
 ├── configs/
@@ -445,7 +445,7 @@ python evaluate_classifiers.py
 
 ---
 
-## Getting Started
+## 12. Getting Started
 
 ```bash
 git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
@@ -466,7 +466,7 @@ streamlit run app.py
 
 ---
 
-## References
+## 13.  References
 
 1. Ronneberger, O., Fischer, P., & Brox, T. (2015). *U-Net: Convolutional Networks for Biomedical Image Segmentation.* MICCAI.
 2. Oktay, O., et al. (2018). *Attention U-Net: Learning Where to Look for the Pancreas.* MIDL.
@@ -477,7 +477,7 @@ streamlit run app.py
 
 ---
 
-## Acknowledgements
+## 14. Acknowledgements
 
 - **BraTS 2021** dataset provided by the RSNA-ASNR-MICCAI Brain Tumor Segmentation challenge organizers
 - **Attention U-Net** architecture based on [Oktay et al. (2018)](https://arxiv.org/abs/1804.03999)
@@ -486,7 +486,7 @@ streamlit run app.py
 
 ---
 
-## Citation
+## 15. Citation
 
 If this work helped your research or coursework, please cite:
 
@@ -502,7 +502,7 @@ If this work helped your research or coursework, please cite:
 
 ---
 
-## License
+## 16. License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
@@ -510,7 +510,7 @@ Copyright (c) 2026 Rajani Lamichhane
 
 ---
 
-## Author
+## 17. Author
 
 **Rajani Lamichhane**
 Machine Learning Engineer · Computer Vision · Biomedical AI
