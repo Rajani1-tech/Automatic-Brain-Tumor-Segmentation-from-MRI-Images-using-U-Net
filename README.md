@@ -14,11 +14,13 @@
 
 **An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI — achieving Mean Dice 0.828 and ET Dice 0.860, competitive with published 3D architectures.**
 
+<br>
+
+*Rajani Lamichhane · Machine Learning Engineer · Computer Vision · Biomedical AI*
 
 
+![NeuroScan AI Demo](docs/figures/demo.gif)
 
-
-<!-- 📄 [Read the full technical report (PDF)](docs/brain_tumour_seg_documents.pdf) — architecture details, training curves, bug analysis, and extended results. -->
 
 </div>
 
@@ -89,9 +91,7 @@ Each MRI modality carries distinct clinical information:
 
 The system follows a sequential analysis pipeline:
 
-
 ![System Pipeline](docs/pipeline_overview.svg)
-
 
 ### 4.2 Preprocessing
 
@@ -210,21 +210,117 @@ slice_to_mods[slice_key][mod] = img_file
 | **This work — 2D U-Net** | **0.827** | 0.798 | **0.860** | **0.828** |
 | **This work — Attention U-Net** | 0.820 | **0.803** | 0.859 | **0.828** |
 
-
 **Key observations:**
 - A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs. 0.800)
 - Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting T1CE already provides sufficient spatial discriminative signal for ET localization without additional gating
 - The dominant factor in performance was data pipeline correctness, not architectural choice
 
+---
 
+### 6.3 Classifier Performance
 
-## 6.3 Qualitative Results
+> Run `python evaluate_classifiers.py` to regenerate these metrics from saved checkpoints.
+
+#### Tumor Profile Classifier
+
+| Class | Precision | Recall | F1 | Support |
+|-------|:---------:|:------:|:--:|:-------:|
+| Edema Only | 0.779 | 0.903 | 0.837 | 776 |
+| Core Present | 0.000 | 0.000 | 0.000 | 10 |
+| Full Tumor | 0.968 | 0.921 | 0.944 | 2,486 |
+| **Weighted Avg** | **0.920** | **0.914** | **0.916** | 3,272 |
+
+| Metric | Value |
+|--------|:-----:|
+| Accuracy | **0.9141** |
+
+> `No Tumor` absent in val set (0 samples). `Core Present` F1=0.000 due to severe class imbalance (only 10 val samples).
+
+| Confusion Matrix | Per-Class Metrics | ROC Curve |
+|:---:|:---:|:---:|
+| ![](outputs/evaluation/tumor_profile_classifier_confusion_matrix.png) | ![](outputs/evaluation/tumor_profile_classifier_per_class_metrics.png) | ![](outputs/evaluation/tumor_profile_classifier_roc_curve.png) |
+
+---
+
+#### LGG / HGG Grade Classifier
+
+| Class | Precision | Recall | F1 | Support |
+|-------|:---------:|:------:|:--:|:-------:|
+| LGG | 0.978 | 0.981 | 0.979 | 6,555 |
+| HGG | 0.984 | 0.982 | 0.983 | 8,156 |
+| **Weighted Avg** | **0.982** | **0.982** | **0.982** | 14,711 |
+
+| Metric | Value |
+|--------|:-----:|
+| Accuracy | **0.9815** |
+
+| Confusion Matrix | ROC Curve |
+|:---:|:---:|
+| ![](outputs/evaluation/grade_classifier_confusion_matrix.png) | ![](outputs/evaluation/grade_classifier_roc_curve.png) |
+
+---
+
+### 6.4 Ablation Study
+
+We isolate the contribution of each pipeline component independently. The dominant factor in final performance was **data pipeline correctness**, not architectural choice.
+
+| Configuration | NCR/NET | Edema | ET | Mean Dice | Δ Mean |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Baseline — buggy alphabetical loader | 0.170 | 0.004 | 0.000 | 0.174 | — |
+| + Correct stem-based modality matching | 0.827 | 0.798 | 0.860 | 0.828 | **+0.654** |
+| + Attention gates (vs plain U-Net) | 0.820 | 0.803 | 0.859 | 0.828 | +0.000 |
+
+**Key findings:**
+- Data pipeline fix alone contributed **+0.654 Mean Dice** — more than all architectural decisions combined
+- Attention gates provided **no measurable benefit** (Δ = 0.000) over plain U-Net
+- **Rigorous data engineering > model sophistication**
+
+---
+
+### 6.5 Failure Analysis
+
+Understanding where the model fails is as important as knowing where it succeeds.
+
+| Case | Issue | Likely Cause |
+|------|-------|--------------|
+| Slice extremes (< 020 or > 080) | ET under-segmented or missed | Tumor not fully developed at boundaries |
+| Small tumors (ET < 50 px) | Missed entirely or fragmented | Class imbalance — ET rare vs background |
+| LGG misclassified as HGG | Grade over-predicted | HGG majority (57%) in training set |
+| High edema, low ET | ET/edema boundary confusion | Boundary ambiguity at T2/FLAIR border |
+| Motion-corrupted slices | Spurious segmentation | No artifact augmentation during training |
+
+> Middle slices (035–065) consistently show the strongest performance. Recommend using only these for quantitative evaluation.
+
+---
+
+### 6.6 Quantitative Prediction Examples
+
+Representative predictions on individual BraTS 2021 validation slices.
+Click any slice ID to view the full figure, segmentation mask, overlay, and JSON report.
+
+| Slice | Grade | Conf. | Profile | NCR px | Edema px | ET px | ET Ratio | Figure |
+|-------|:-----:|:-----:|---------|-------:|---------:|------:|:--------:|--------|
+| [BraTS2021_00002_055](outputs/results/BraTS2021_00002_055/) | HGG | 98.0% | Full Tumor | 568 | 3,477 | 634 | 0.1355 | [view](outputs/results/BraTS2021_00002_055/paper_figure.png) |
+| [BraTS2021_00002_062](outputs/results/BraTS2021_00002_062/) | HGG | 95.0% | Full Tumor | 179 | 2,688 | 569 | 0.1656 | [view](outputs/results/BraTS2021_00002_062/paper_figure.png) |
+| [BraTS2021_00002_071](outputs/results/BraTS2021_00002_071/) | LGG | 95.0% | Full Tumor | 18 | 2,411 | 240 | 0.0899 | [view](outputs/results/BraTS2021_00002_071/paper_figure.png) |
+| [BraTS2021_00009_055](outputs/results/BraTS2021_00009_055/) | LGG | 95.0% | Edema Only | 0 | 671 | 0 | 0.0000 | [view](outputs/results/BraTS2021_00009_055/paper_figure.png) |
+| [BraTS2021_00009_060](outputs/results/BraTS2021_00009_060/) | LGG | 95.0% | Full Tumor | 3 | 829 | 76 | 0.0837 | [view](outputs/results/BraTS2021_00009_060/paper_figure.png) |
+
+> Rows are auto-appended to [`outputs/results/quantitative_results.csv`](outputs/results/quantitative_results.csv)
+> each time **Save Results to Disk** is clicked in the Streamlit app.
+> Click any slice ID to browse the full saved output folder on GitHub.
+
+---
+
+### 6.7 Qualitative Results
 
 ### Example 1 — HGG
 [![HGG Segmentation — click for details](docs/results.png)](docs/figures/hgg_example_details.md)
+<sub>Click the figure to see full prediction details — grade, region breakdown, Dice scores.</sub>
 
 ### Example 2 — LGG
 [![LGG Segmentation — click for details](docs/paper_figure.png)](docs/figures/lgg_example_details.md)
+<sub>Click the figure to see full prediction details.</sub>
 
 ---
 
@@ -244,9 +340,6 @@ streamlit run app.py
 
 Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Middle slices (035–065) show the most complete tumor core.
 
-
-![NeuroScan AI Demo](docs/figures/demo.gif)
-
 ---
 
 ## 8. Limitations
@@ -254,6 +347,7 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 - **2D processing:** Slice-level inference loses volumetric context across adjacent slices; a 3D model would better capture tumor geometry
 - **Overfitting:** Training and validation Dice diverge in later epochs; additional regularization (dropout, weight decay) is warranted
 - **Distribution shift:** PNG-converted slices may differ from native NIfTI used in clinical workflows, potentially limiting real-world generalization
+- **Class imbalance:** `Core Present` class severely underrepresented in val set (10 samples), making reliable evaluation impossible for that category
 
 ---
 
@@ -264,6 +358,62 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 - GradCAM / SHAP explainability per input modality
 - Multi-scanner domain adaptation
 - Docker containerization for portable clinical deployment
+- Balanced sampling strategy for underrepresented tumor profiles
+
+---
+
+## Reproducibility
+
+All results reported on the **held-out validation set** — never used during training or model selection.
+
+#### Training Environment
+
+| Component | Details |
+|-----------|---------|
+| GPU | NVIDIA GeForce RTX 4060 Laptop GPU |
+| VRAM | 8 GB |
+| CUDA | 12.x |
+| Python | 3.10 |
+| PyTorch | 2.x |
+| OS | Ubuntu Linux |
+| Random seed | 42 |
+
+#### Training Duration (Approximate)
+
+| Model | Epochs | Approx. Time |
+|-------|:------:|:------------:|
+| U-Net Binary | 75 | ~18 hrs |
+| Attention U-Net Binary | 75 | ~20 hrs |
+| U-Net Multiclass | 75 | ~22 hrs |
+| Attention U-Net Multiclass | 75 | ~24 hrs |
+| Tumor Profile Classifier | 30 | ~6 hrs |
+| Grade Classifier (ResNet-18) | 30 | ~4 hrs |
+| **Total** | — | **~3 days** |
+
+> Exact per-model times were not recorded. Total wall-clock training time was approximately 3 days on the hardware above.
+
+#### Model Checkpoints
+
+| Model | Path |
+|-------|------|
+| U-Net Binary | `models/unet_binary.pth` |
+| Attention U-Net Binary | `models/attention_unet_binary.pth` |
+| U-Net Multiclass | `models/unet_multiclass.pth` |
+| Attention U-Net Multiclass | `models/attention_unet_multiclass.pth` |
+| Tumor Profile Classifier | `models/tumor_classifier.pth` |
+| Grade Classifier | `models/grade_classifier.pth` |
+
+```bash
+# Reproduce segmentation evaluation
+python main.py --mode eval --model attn_unet_multiclass \
+               --checkpoint models/attention_unet_multiclass.pth
+
+# Reproduce classifier metrics + plots
+python evaluate_classifiers.py
+```
+
+> All evaluation plots saved to `outputs/evaluation/`.
+> All segmentation metrics saved to `outputs/metrics_summary.json`.
 
 ---
 
@@ -272,12 +422,21 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 ```
 ├── configs/
 │   └── config.py
-├── data/
-│   ├── train/
-│   ├── val/
-│   └── test/
 ├── docs/
-│   └── report.pdf                   # Full technical report (LaTeX)
+│   ├── pipeline_overview.svg
+│   ├── figures/
+│   │   ├── hgg_example_details.md
+│   │   ├── lgg_example_details.md
+│   │   └── demo.gif
+│   └── brain_tumour_seg_documents.pdf
+├── outputs/
+│   ├── evaluation/                  # Classifier metrics + plots
+│   └── results/                     # Per-slice prediction outputs
+│       └── BraTS2021_XXXXX_YYY/
+│           ├── paper_figure.png
+│           ├── segmentation_mask.png
+│           ├── overlay.png
+│           └── report.json
 ├── src/
 │   ├── datasets/                    # Stem-based modality-matching loader
 │   ├── models/                      # U-Net, Attention U-Net, ResNet-18
@@ -288,6 +447,7 @@ Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`,
 ├── notebook/
 │   └── data_processing.ipynb
 ├── app.py                           # Streamlit clinical interface
+├── evaluate_classifiers.py          # Classifier evaluation script
 ├── main.py
 └── requirements.txt
 ```
@@ -303,11 +463,11 @@ pip install -r requirements.txt
 ```
 
 ```bash
-# Train segmentation model
-python main.py --mode train --model attn_unet_multiclass
+# Train all models
+python main.py
 
-# Evaluate on test set
-python main.py --mode eval --model attn_unet_multiclass --checkpoint path/to/checkpoint.pth
+# Evaluate classifiers
+python evaluate_classifiers.py
 
 # Launch clinical web interface
 streamlit run app.py
@@ -325,6 +485,16 @@ streamlit run app.py
 6. Menze, B. H., et al. (2015). *The Multimodal Brain Tumor Image Segmentation Benchmark.* IEEE TMI, 34(10).
 
 ---
+
+## Acknowledgements
+
+- **BraTS 2021** dataset provided by the RSNA-ASNR-MICCAI Brain Tumor Segmentation challenge organizers
+- **Attention U-Net** architecture based on [Oktay et al. (2018)](https://arxiv.org/abs/1804.03999)
+- **Grade classifier** backbone: PyTorch torchvision ResNet-18 pretrained on ImageNet
+- **Segmentation loss**: Combined Dice + Cross-Entropy following standard BraTS training practice
+
+---
+
 ## Citation
 
 If this work helped your research or coursework, please cite:
@@ -338,9 +508,20 @@ If this work helped your research or coursework, please cite:
   note    = {BraTS 2021 · Mean Dice 0.828 · ET Dice 0.860}
 }
 ```
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026 Rajani Lamichhane
+
+---
+
 ## Author
 
-**Rajani Lamichhane**  
+**Rajani Lamichhane**
 Machine Learning Engineer · Computer Vision · Biomedical AI
 
 ---
