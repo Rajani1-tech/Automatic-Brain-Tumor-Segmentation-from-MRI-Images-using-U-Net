@@ -90,23 +90,8 @@ Each MRI modality carries distinct clinical information:
 
 The system follows a sequential analysis pipeline:
 
-```
-Four-Modality MRI Input (T1, T1CE, T2, FLAIR)
-        │
-        ▼
-  Preprocessing & Augmentation
-        │
-        ▼
-  Multiclass Segmentation (Attention U-Net)
-    ├── NCR/NET · Edema · ET masks
-        │
-        ▼
-  Tumor Severity Classification (CNN)
-    ├── No Tumor / Edema Only / Core Present / Full Tumor
-        │
-        ▼
-  Grade Prediction (ResNet-18 fine-tuned)
-    └── LGG vs. HGG
+
+![System Pipeline](docs/pipeline_overview.svg)
 ```
 
 ### 4.2 Preprocessing
