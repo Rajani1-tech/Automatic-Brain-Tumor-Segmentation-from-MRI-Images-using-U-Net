@@ -15,9 +15,8 @@
 **An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI — achieving Mean Dice 0.828 and ET Dice 0.860, competitive with published 3D architectures.**
 
 
-## Demo
 
-![NeuroScan AI Demo](docs/figures/demo.gif)
+
 
 <!-- 📄 [Read the full technical report (PDF)](docs/brain_tumour_seg_documents.pdf) — architecture details, training curves, bug analysis, and extended results. -->
 
@@ -92,7 +91,7 @@ The system follows a sequential analysis pipeline:
 
 
 ![System Pipeline](docs/pipeline_overview.svg)
-```
+
 
 ### 4.2 Preprocessing
 
@@ -244,6 +243,9 @@ streamlit run app.py
 ```
 
 Upload files following BraTS naming convention — `BraTS2021_XXXXX_t1_YYY.png`, `_t1ce_`, `_t2_`, `_flair_`. Middle slices (035–065) show the most complete tumor core.
+
+
+![NeuroScan AI Demo](docs/figures/demo.gif)
 
 ---
 
