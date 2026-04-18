@@ -34,24 +34,6 @@ A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET
 
 ---
 
-## Quick Start
-
-```bash
-git clone https://github.com/rajanilamichhane/Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net.git
-cd Automatic-Brain-Tumor-Segmentation-from-MRI-Images-using-U-Net
-pip install -r requirements.txt
-
-# Train all models
-python main.py
-
-# Evaluate classifiers
-python evaluate_classifiers.py
-
-# Launch clinical web interface
-streamlit run app.py
-```
-
----
 
 ## Table of Contents
 
