@@ -65,7 +65,7 @@ Recent advances in deep learning, particularly encoder–decoder architectures l
 - A stem-based modality-matching data loader that guarantees correct 4-channel assembly
 - A documented critical bug fix (ET Dice: 0.000 → 0.860) with analysis of root cause and impact
 - An LGG/HGG grade classifier using fine-tuned ResNet-18
-- A clinical-grade Streamlit interface for end-to-end MRI-to-prediction inference
+- A Streamlit interface for end-to-end MRI-to-prediction interface.
 
 ---
 
@@ -220,17 +220,8 @@ slice_to_mods[slice_key][mod] = img_file
 | U-Net Multiclass | **0.828** | **0.763** | 0.993 |
 | Attention U-Net Multiclass | **0.828** | **0.763** | **0.993** |
 
-### 6.2 Comparison with Published Baselines
-
-| Method | NCR/NET | Edema | ET | Mean Dice |
-|--------|:-------:|:-----:|:--:|:---------:|
-| Standard 2D U-Net (literature) | 0.550 | 0.720 | 0.670 | 0.650 |
-| 3D ResU-Net — Myronenko (2018) | 0.810 | 0.840 | 0.800 | 0.820 |
-| **This work — 2D U-Net** | **0.827** | 0.798 | **0.860** | **0.828** |
-| **This work — Attention U-Net** | 0.820 | **0.803** | 0.859 | **0.828** |
 
 **Key observations:**
-- A correctly assembled 2D model surpasses 3D ResU-Net on ET Dice (0.860 vs. 0.800)
 - Attention gates provided no measurable benefit over plain U-Net (Δ Mean Dice = 0.001), suggesting T1CE already provides sufficient spatial discriminative signal for ET localization without additional gating
 - The dominant factor in performance was data pipeline correctness, not architectural choice
 
