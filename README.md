@@ -12,7 +12,7 @@
 
 <br>
 
-**An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI — achieving Mean Dice 0.828 and ET Dice 0.860, competitive with published 3D architectures.**
+**An end-to-end deep learning pipeline for multiclass brain tumor segmentation and grade classification from multi-modal MRI — achieving Mean Dice 0.828 and ET Dice 0.860.**
 
 <br>
 
@@ -30,7 +30,7 @@
 
 Brain tumor segmentation from MRI is a critical yet time-consuming clinical task, prone to significant inter-observer variability. This project presents a fully automated pipeline that performs **pixel-level multiclass segmentation** of three clinically meaningful tumor subregions — Necrotic Core/Non-Enhancing Tumor (NCR/NET), Peritumoral Edema, and Enhancing Tumor (ET) — followed by tumor severity classification and LGG/HGG grade prediction, all from four-modality MRI input.
 
-A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET Dice 0.860**, surpassing published 3D architectures at significantly lower computational cost. A critical data pipeline bug discovered during development — where naive alphabetical file slicing excluded T1CE from all training batches — is thoroughly documented. Fixing it improved ET Dice from **0.000 to 0.860** without any architectural changes, demonstrating that rigorous data engineering can matter more than model sophistication.
+A 2D Attention U-Net trained on BraTS 2021 achieves **Mean Dice 0.828** and **ET Dice 0.860**. A critical data pipeline bug discovered during development — where naive alphabetical file slicing excluded T1CE from all training batches — is thoroughly documented. Fixing it improved ET Dice from **0.000 to 0.860** without any architectural changes, demonstrating that rigorous data engineering can matter more than model sophistication.
 
 ---
 
